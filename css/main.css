@@ -1719,16 +1719,18 @@ pre code {
   width: 100%;
   z-index: 1500;
 }
+@media (min-width: 768px) {
+  .post-block:hover {
+    transform: translateX(20px);
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
+}
 .post-block {
   padding: 20px 20px 20px 20px;
   margin-bottom: 20px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: all 0.3s;
   position: relative;
-}
-.post-block:hover {
-  transform: translateX(20px);
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 .post-body {
   font-family: Lato, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -2610,7 +2612,7 @@ ul.breadcrumb li + li:last-child {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #f48e41;
+  background: #e075b9;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
