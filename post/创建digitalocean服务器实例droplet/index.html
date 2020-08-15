@@ -16,16 +16,17 @@
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   
   <link rel="stylesheet" href="/lib/animate-css/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 <script class="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+    var CONFIG = {"hostname":"www.luqifu.tech","root":"/","scheme":"Muse","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
   <meta name="description" content="本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="创建DigitalOcean服务器实例Droplet">
-<meta property="og:url" content="http://yoursite.com/2020/08/13/VPS-DigitalOcean-Droplet-Create/index.html">
+<meta property="og:url" content="https://www.luqifu.tech/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/index.html">
 <meta property="og:site_name" content="富仔的技术博">
 <meta property="og:description" content="本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。">
 <meta property="og:locale" content="zh_CN">
@@ -42,7 +43,7 @@
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg">
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg">
 <meta property="article:published_time" content="2020-08-13T01:05:55.000Z">
-<meta property="article:modified_time" content="2020-08-13T11:07:33.864Z">
+<meta property="article:modified_time" content="2020-08-15T04:43:35.119Z">
 <meta property="article:author" content="Qifu LU">
 <meta property="article:tag" content="DigitalOcean">
 <meta property="article:tag" content="Cloud Deployment">
@@ -50,7 +51,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg">
 
-<link rel="canonical" href="http://yoursite.com/2020/08/13/VPS-DigitalOcean-Droplet-Create/">
+<link rel="canonical" href="https://www.luqifu.tech/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/">
 
 
 <script class="page-configurations">
@@ -135,6 +136,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -163,11 +165,38 @@
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
           
@@ -192,7 +221,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
-          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">引文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C%E8%B4%A6%E6%88%B7"><span class="nav-number">3.</span> <span class="nav-text">注册账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.</span> <span class="nav-text">创建项目</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80-%E7%99%BB%E5%BD%95%E8%B4%A6%E6%88%B7%E5%90%8E-%E5%88%9B%E5%BB%BA-new-project"><span class="nav-number">4.0.1.</span> <span class="nav-text">(一) 登录账户后, 创建 new project.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C-%E5%A1%AB%E5%86%99%E6%82%A8%E7%9A%84%E9%A1%B9%E7%9B%AE%E5%90%8D%E7%A7%B0%EF%BC%8C%E6%8F%8F%E8%BF%B0%E5%92%8C%E7%94%A8%E9%80%94%E3%80%82"><span class="nav-number">4.0.2.</span> <span class="nav-text">(二) 填写您的项目名称，描述和用途。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%89-%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E5%90%8E%EF%BC%8C%E9%9C%80%E8%A6%81%E4%B8%BA%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA-Droplet-%EF%BC%88Droplet-%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AA-VPS-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8B%EF%BC%89%E3%80%82"><span class="nav-number">4.0.3.</span> <span class="nav-text">(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9B-%E9%80%89%E6%8B%A9-Droplet-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E4%BA%91%E7%AB%AF%E9%85%8D%E7%BD%AE%E3%80%82%E8%AF%B7%E6%A0%B9%E6%8D%AE%E6%82%A8%E5%AE%9E%E9%99%85%E9%9C%80%E8%A6%81%E8%87%AA%E8%A1%8C%E9%85%8D%E7%BD%AE%EF%BC%8C%E6%9C%AC%E6%95%99%E7%A8%8B%E4%B8%AD%E4%BD%BF%E7%94%A8-ubuntu18-04-3-LTS-%E7%89%88%E6%9C%AC%E3%80%82"><span class="nav-number">4.0.4.</span> <span class="nav-text">(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%94-%E5%BB%BA%E8%AE%AE%E9%80%89%E6%8B%A9%E6%B7%BB%E5%8A%A0-SSH-key%E3%80%82%E8%BF%99%E5%B0%86%E7%94%A8%E4%BA%8E%E6%9C%AC%E6%9C%BA%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E3%80%82%E4%BD%BF%E7%94%A8-SSH-keys-%E9%AA%8C%E8%AF%81%E6%AF%94%E4%BC%A0%E7%BB%9F%E7%9A%84%E5%AF%86%E7%A0%81%E9%AA%8C%E8%AF%81%E6%9B%B4%E5%8A%A0%E5%AE%89%E5%85%A8%E6%96%B9%E4%BE%BF%E3%80%82"><span class="nav-number">4.0.5.</span> <span class="nav-text">(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AD-%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E6%9C%BA%E5%90%8D%EF%BC%8C%E5%88%9B%E5%BB%BA-Droplet"><span class="nav-number">4.0.6.</span> <span class="nav-text">(六) 自定义主机名，创建 Droplet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%83-%E5%88%9B%E5%BB%BA%E5%AE%8C%E6%88%90%E5%90%8E%EF%BC%8C%E8%8E%B7%E5%8F%96-Droplet-%E7%9A%84%E5%85%AC%E7%BD%91-IP"><span class="nav-number">4.0.7.</span> <span class="nav-text">(七) 创建完成后，获取 Droplet 的公网 IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AB-%E6%A3%80%E6%9F%A5%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%98%AF%E5%90%A6%E6%BF%80%E6%B4%BB"><span class="nav-number">4.0.8.</span> <span class="nav-text">(八) 检查云服务器是否激活</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B9%9D-%E6%81%AD%E5%96%9C%E4%BD%A0%EF%BC%8C%E4%BD%A0%E5%B7%B2%E7%BB%8F%E6%8B%A5%E6%9C%89%E4%BA%86%E4%B8%80%E5%8F%B0-DigitalOcean-%E7%9A%84%E4%BA%91%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E3%80%82"><span class="nav-number">4.0.9.</span> <span class="nav-text">(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C%E8%B4%A6%E6%88%B7"><span class="nav-number">3.</span> <span class="nav-text">注册账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.</span> <span class="nav-text">创建项目</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80-%E7%99%BB%E5%BD%95%E8%B4%A6%E6%88%B7%E5%90%8E-%E5%88%9B%E5%BB%BA-new-project"><span class="nav-number">4.0.1.</span> <span class="nav-text">(一) 登录账户后, 创建 new project.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C-%E5%A1%AB%E5%86%99%E6%82%A8%E7%9A%84%E9%A1%B9%E7%9B%AE%E5%90%8D%E7%A7%B0%EF%BC%8C%E6%8F%8F%E8%BF%B0%E5%92%8C%E7%94%A8%E9%80%94%E3%80%82"><span class="nav-number">4.0.2.</span> <span class="nav-text">(二) 填写您的项目名称，描述和用途。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%89-%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E5%90%8E%EF%BC%8C%E9%9C%80%E8%A6%81%E4%B8%BA%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA-Droplet-%EF%BC%88Droplet-%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AA-VPS-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8B%EF%BC%89%E3%80%82"><span class="nav-number">4.0.3.</span> <span class="nav-text">(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9B-%E9%80%89%E6%8B%A9-Droplet-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E4%BA%91%E7%AB%AF%E9%85%8D%E7%BD%AE%E3%80%82%E8%AF%B7%E6%A0%B9%E6%8D%AE%E6%82%A8%E5%AE%9E%E9%99%85%E9%9C%80%E8%A6%81%E8%87%AA%E8%A1%8C%E9%85%8D%E7%BD%AE%EF%BC%8C%E6%9C%AC%E6%95%99%E7%A8%8B%E4%B8%AD%E4%BD%BF%E7%94%A8-ubuntu18-04-3-LTS-%E7%89%88%E6%9C%AC%E3%80%82"><span class="nav-number">4.0.4.</span> <span class="nav-text">(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%94-%E5%BB%BA%E8%AE%AE%E9%80%89%E6%8B%A9%E6%B7%BB%E5%8A%A0-SSH-key%E3%80%82%E8%BF%99%E5%B0%86%E7%94%A8%E4%BA%8E%E6%9C%AC%E6%9C%BA%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E3%80%82%E4%BD%BF%E7%94%A8-SSH-keys-%E9%AA%8C%E8%AF%81%E6%AF%94%E4%BC%A0%E7%BB%9F%E7%9A%84%E5%AF%86%E7%A0%81%E9%AA%8C%E8%AF%81%E6%9B%B4%E5%8A%A0%E5%AE%89%E5%85%A8%E6%96%B9%E4%BE%BF%E3%80%82"><span class="nav-number">4.0.5.</span> <span class="nav-text">(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AD-%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E6%9C%BA%E5%90%8D%EF%BC%8C%E5%88%9B%E5%BB%BA-Droplet"><span class="nav-number">4.0.6.</span> <span class="nav-text">(六) 自定义主机名，创建 Droplet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%83-%E5%88%9B%E5%BB%BA%E5%AE%8C%E6%88%90%E5%90%8E%EF%BC%8C%E8%8E%B7%E5%8F%96-Droplet-%E7%9A%84%E5%85%AC%E7%BD%91-IP"><span class="nav-number">4.0.7.</span> <span class="nav-text">(七) 创建完成后，获取 Droplet 的公网 IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AB-%E6%A3%80%E6%9F%A5%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%98%AF%E5%90%A6%E6%BF%80%E6%B4%BB"><span class="nav-number">4.0.8.</span> <span class="nav-text">(八) 检查云服务器是否激活</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B9%9D-%E6%81%AD%E5%96%9C%E4%BD%A0%EF%BC%8C%E4%BD%A0%E5%B7%B2%E7%BB%8F%E6%8B%A5%E6%9C%89%E4%BA%86%E4%B8%80%E5%8F%B0-DigitalOcean-%E7%9A%84%E4%BA%91%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E3%80%82"><span class="nav-number">4.0.9.</span> <span class="nav-text">(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</span></a></li></ol></li></ol></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -203,6 +232,10 @@
   <p class="site-author-name" itemprop="name">Qifu LU</p>
   <div class="site-description" itemprop="description">全栈开发的小日常</div>
 </div>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：3.7k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
@@ -269,6 +302,9 @@
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/LQF2020" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 
 <noscript>
   <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
@@ -285,7 +321,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/13/VPS-DigitalOcean-Droplet-Create/">
+    <link itemprop="mainEntityOfPage" href="https://www.luqifu.tech/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://luqifu.com/img/avatar.jpg">
@@ -309,10 +345,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-08-13 11:05:55 / 修改时间：21:07:33" itemprop="dateCreated datePublished" datetime="2020-08-13T11:05:55+10:00">2020-08-13</time>
+              <time title="创建时间：2020-08-13 11:05:55" itemprop="dateCreated datePublished" datetime="2020-08-13T11:05:55+10:00">2020-08-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-15 14:43:35" itemprop="dateModified" datetime="2020-08-15T14:43:35+10:00">2020-08-15</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -324,8 +366,27 @@
             </span>
 
           
-            <div class="post-description">本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</div>
-
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>322</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 mins</span>
+            </span>
         </div>
       </header>
 
@@ -333,7 +394,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="引文"><a href="#引文" class="headerlink" title="引文"></a>引文</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
 <h2 id="注册账户"><a href="#注册账户" class="headerlink" title="注册账户"></a>注册账户</h2><p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a target="_blank" rel="noopener" href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
 <h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><hr>
@@ -347,7 +408,7 @@
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg" alt="创建新项目"></p>
 <hr>
 <h4 id="五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h4><blockquote>
-<p>尚未拥有 SSH key 公私钥，请参考 <a href="/2020/08/13/SSH-Keys-Create/" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
+<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
 </blockquote>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg" alt="创建新项目"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg" alt="创建新项目"></p>
 <hr>
@@ -363,12 +424,29 @@
     
     
     
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Qifu LU
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.luqifu.tech/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/" title="创建DigitalOcean服务器实例Droplet">https://www.luqifu.tech/post/创建digitalocean服务器实例droplet/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/DigitalOcean/" rel="tag"># DigitalOcean</a>
-              <a href="/tags/Cloud-Deployment/" rel="tag"># Cloud Deployment</a>
-              <a href="/tags/VPS/" rel="tag"># VPS</a>
+              <a href="/tags/DigitalOcean/" rel="tag"><i class="fa fa-tag"></i> DigitalOcean</a>
+              <a href="/tags/Cloud-Deployment/" rel="tag"><i class="fa fa-tag"></i> Cloud Deployment</a>
+              <a href="/tags/VPS/" rel="tag"><i class="fa fa-tag"></i> VPS</a>
           </div>
 
         
@@ -377,11 +455,11 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/08/13/SSH-Keys-Create/" rel="prev" title="SSH公钥创建教程">
+    <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/" rel="prev" title="SSH公钥创建教程">
       <i class="fa fa-chevron-left"></i> SSH公钥创建教程
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/08/13/Nginx-Node-Https-Access/" rel="next" title="使用Let's Encrypt在Nginx中为Node应用添加HTTPS访问">
+    <a href="/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/" rel="next" title="使用Let's Encrypt在Nginx中为Node应用添加HTTPS访问">
       使用Let's Encrypt在Nginx中为Node应用添加HTTPS访问 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -436,11 +514,36 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Qifu LU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：3.7k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -455,6 +558,8 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
 
 <script src="/js/utils.js"></script>
 
@@ -470,6 +575,10 @@
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 

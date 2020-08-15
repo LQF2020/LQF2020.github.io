@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>DigitalOcean, Node.js, Nginx, PM2整合部署方案</title>
+    <url>/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过阅读本教程，你将会学习如何将 Node.js 应用部署到云端服务器 DigitalOcean 中，并整合 SSH 登录， Nginx 作为反向代理，PM2 进程管理器， 防火墙端口配置的相关知识。</p>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><ol>
+<li>为需要部署的网站购买自定义域名。尚未拥有域名，可前往 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 或者 其他域名提供商注册。</li>
+<li>本地创建 SSH 连接的公私钥。尚未拥有公钥，前往 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/" title="SSH公钥创建">SSH公钥创建</a> 教程。</li>
+<li>创建网站部署的云服务器（VPS）。本教程使用 DigitalOcean 创建。尚未拥有 VPS, 前往 <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/" title="DigitalOcean服务器创建">DigitalOcean服务器创建</a> 教程。</li>
+</ol>
+<h2 id="教程用例"><a href="#教程用例" class="headerlink" title="教程用例"></a>教程用例</h2><ul>
+<li>GoDaddy 创建的网站域名：demo.luqifu.tech ( 仅供教程使用 )</li>
+<li>DigitalOcean 服务器【Ubuntu18.04.3】 IP: 161.35.59.204 ( 仅供教程使用 )</li>
+</ul>
+<h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><ol>
+<li>使用 SSH public key 远程登录 DigitalOcean 云服务器</li>
+<li>创建 Node.js 应用，WEB 框架为 Express.js</li>
+<li>安装 Node 应用管理器 PM2，并且后台运行 Express.js</li>
+<li>DNS 域名和服务器 IP 绑定</li>
+<li>Nginx 下载，进行反向代理配置</li>
+</ol>
+<h3 id="（一）使用-SSH-public-key-远程登录-DigitalOcean-云服务器"><a href="#（一）使用-SSH-public-key-远程登录-DigitalOcean-云服务器" class="headerlink" title="（一）使用 SSH public key 远程登录 DigitalOcean 云服务器"></a><strong>（一）使用 SSH public key 远程登录 DigitalOcean 云服务器</strong></h3><p>本地控制台输入</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ssh root@xxx.xxx.xxx.xxx <span class="comment"># 这里，我输入 ssh root@161.35.59.204</span></span><br></pre></td></tr></table></figure>
+
+<p>登陆方式有两种，密码登录 和 SSH keys 登录，我们更推荐后者，后者更方便和安全。<br>如何创建属于您的 SSH 公钥对，请参考教程 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/" title="SSH公钥创建">SSH公钥创建</a>。</p>
+<p>成功登录后，界面如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh root@161.35.59.204</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Last login: Wed Aug 12 01:57:51 2020</span><br><span class="line">root@my-node-server:~#</span><br></pre></td></tr></table></figure>
+
+<h3 id="（二）创建-Node-js-应用，教程使用-WEB-框架为-Express-js"><a href="#（二）创建-Node-js-应用，教程使用-WEB-框架为-Express-js" class="headerlink" title="（二）创建 Node.js 应用，教程使用 WEB 框架为 Express.js"></a><strong>（二）创建 Node.js 应用，教程使用 WEB 框架为 Express.js</strong></h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 成功登录您的服务器后，请执行：</span><br><span class="line"># 注意：本教程使用Ubuntu的apt安装工具包，请选择适合您OS的包安装工具：</span><br><span class="line"></span><br><span class="line">sudo apt-get update      # 更新服务器的软件库</span><br><span class="line">sudo apt-get upgrade     # 更新服务器的软件包</span><br><span class="line"></span><br><span class="line">sudo apt-get install nodejs   # 安装node包</span><br><span class="line">sudo apt-get install npm      # 安装npm包</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 检查上述包是否安装成功</span><br><span class="line"></span><br><span class="line">node -v</span><br><span class="line"># v8.10.0 版本号</span><br><span class="line"></span><br><span class="line">npm -v</span><br><span class="line"># 3.5.2 版本号</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd ~                         # 进入当前用户目录</span><br><span class="line">mkdir HelloWorld             # 创建名为 HelloWorld的文件夹</span><br><span class="line">cd HelloWorld                # 进入HelloWorld文件夹目录下</span><br><span class="line">npm init                     # 初始化npm库</span><br><span class="line">npm install express --save   # 安装express依赖</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"># 创建 app.js 文件，实现一个基于 Express 简单的 http 服务器，端口为 3000。</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> app = express()</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">app.get(<span class="string">&#x27;/&#x27;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">res.send(<span class="string">&#x27;Hello World!&#x27;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(port, <span class="function">() =&gt;</span> &#123;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`Example app listening at http://localhost:<span class="subst">$&#123;port&#125;</span>`</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">node app.js               # 运行 app.js</span><br></pre></td></tr></table></figure>
+
+<p>最后，在任意浏览器输入 http://{ 您的服务器 IP }:3000/ ， 即可看到 “Hello World” !</p>
+<p>恭喜！到这一步， 你可以通过浏览器访问 服务器 IP 地址，获取基于 Node 创建的 HelloWorld 应用页面 !</p>
+<h3 id="（三）安装-Node-应用管理器-PM2，并且后台运行-Express-js"><a href="#（三）安装-Node-应用管理器-PM2，并且后台运行-Express-js" class="headerlink" title="（三）安装 Node 应用管理器 PM2，并且后台运行 Express.js"></a><strong>（三）安装 Node 应用管理器 PM2，并且后台运行 Express.js</strong></h3><p>使用 PM2 好处：可以后台持续运行 node.js 应用，不用担心服务器重启导致网站关闭。它允许创建,管理和销毁多个 Node.js 应用实例。</p>
+<p>PM2 官网：<a href="https://pm2.keymetrics.io/">https://pm2.keymetrics.io/</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">npm install pm2 -g        # 在服务器进行 PM2 全局安装</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd ~&#x2F;HelloWorld&#x2F;                       # 进入项目目录下</span><br><span class="line">pm2 start app.js --name Helloworld     # PM2 运行 node.js 应用</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 通过执行下列命令，可保证云服务器开机后，pm2管理器自动运行Node.js应用</span><br><span class="line"></span><br><span class="line"># 查看当前所有被pm2管理的应用列表</span><br><span class="line">pm2 list</span><br><span class="line"></span><br><span class="line"># 将当前列表中的所有应用永久储存在pm2中</span><br><span class="line">pm2 save</span><br><span class="line"></span><br><span class="line"># 将pm2配置成系统开启服务</span><br><span class="line">pm2 startup</span><br></pre></td></tr></table></figure>
+
+<h3 id="（四）DNS-域名和服务器-IP-绑定"><a href="#（四）DNS-域名和服务器-IP-绑定" class="headerlink" title="（四）DNS 域名和服务器 IP 绑定"></a><strong>（四）DNS 域名和服务器 IP 绑定</strong></h3><p>在您的 DNS 域名提供商的管理界面中，将 ip 地址和域名进行绑定。此教程使用 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 作为域名提供商，请读者根据实际情况进行设置。</p>
+<p>GoDaddy 配置具体步骤：</p>
+<ul>
+<li>创建 A 记录： key 为@，value 为 DigitalOcean 为你分配的服务器 IP。 例如，此教程 IP 是 161.35.59.204， TTL 默认 1h.N</li>
+<li>创建 CNAME 记录： key 为 www, value 为 @。 例如，此教程 IP 是 161.35.59.204, TTL 默认 1h.</li>
+</ul>
+<p>注意，域名和 IP 绑定后，由于网络 DNS 缓存机制，对应关系不会立马生效，实际生效时间快则数分钟，慢则数小时。</p>
+<p>检验方法：</p>
+<p>控制台，输入指令 “ping yourdomain.com”, 查看连接状态。如果连接返回来自服务器 IP 的网络包，则代表域名已成功匹配 IP。</p>
+<h3 id="（五）Nginx-下载，进行反向代理配置，域名绑定"><a href="#（五）Nginx-下载，进行反向代理配置，域名绑定" class="headerlink" title="（五）Nginx 下载，进行反向代理配置，域名绑定"></a><strong>（五）Nginx 下载，进行反向代理配置，域名绑定</strong></h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 本教程使用Ubuntu18.04.3操作系统，请根据您OS版本进行Nginx安装。</span><br><span class="line"></span><br><span class="line">sudo apt update          # 更新软件库</span><br><span class="line">sudo apt install nginx      # 下载nginx</span><br><span class="line">sudo systemctl enable nginx # 配置nginx 作为开机服务</span><br></pre></td></tr></table></figure>
+
+<p>当 nginx 下载后，在本地浏览器输入 <a href="http://161.35.59.204/">http://161.35.59.204:80/</a><br>看到 nginx 页面，表示 nginx 服务已经运行起来。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 打开nginx 默认配置文件</span><br><span class="line">sudo nano &#x2F;etc&#x2F;nginx&#x2F;nginx.conf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># nginx.conf 文件</span><br><span class="line"># 请确保http框中存在下面两句指令（ 一般默认存在，若不存在，则需手动添加 ）</span><br><span class="line"></span><br><span class="line">http&#123;</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">include &#x2F;etc&#x2F;nginx&#x2F;conf.d&#x2F;*.conf;</span><br><span class="line">include &#x2F;etc&#x2F;nginx&#x2F;sites-enabled&#x2F;*;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接着，进入 conf.d 文件夹中，为 helloworld 应用创建独立的配置文件，实际上，只要文件后缀是.conf，都会被 nginx 读取，但建议使用和项目名称相关联的命名方法，这里我们使用 com.helloworld.conf</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">touch &#x2F;etc&#x2F;nginx&#x2F;conf.d&#x2F;com.helloworld.conf  # 创建配置文件</span><br></pre></td></tr></table></figure>
+
+<p>拷贝以下内容，保存文件并退出。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># com.helloworld.conf 文件</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">       listen       80;</span><br><span class="line">       # 填写您在服务商购买的域名，本教程使用域名 demo.luqifu.tech</span><br><span class="line">       server_name   demo.luqifu.tech;</span><br><span class="line"></span><br><span class="line">    charset utf8;</span><br><span class="line"></span><br><span class="line">     location &#x2F; &#123;</span><br><span class="line"></span><br><span class="line">        # 映射到代理服务器，可以是ip加端口 或 url</span><br><span class="line">        proxy_pass       http:&#x2F;&#x2F;127.0.0.1:3000;</span><br><span class="line"></span><br><span class="line">        proxy_set_header Host      $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接着，在控制台运行以下命令</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Nginx -t  # 修改后检查配置文件格式</span><br><span class="line">nginx -s reload  # 让nginx重新读取conf配置</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>现在，在浏览器中直接访问域名，就能直接访问 Helloworld 网页。</p>
+<h3 id="（六）防火墙端口-80-443-端口配置"><a href="#（六）防火墙端口-80-443-端口配置" class="headerlink" title="（六）防火墙端口 80/443 端口配置"></a><strong>（六）防火墙端口 80/443 端口配置</strong></h3><p>但是，为了提高网站安全性，我们不希望用户通过 3000 端口访问网站。相反，应该在服务器端配置防火墙，只允许用户通过 80(HTTP)和 443（HTTPS）端口访问网站,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 安装防火墙</span><br><span class="line">sudo apt update</span><br><span class="line">sudo apt install ufw</span><br><span class="line"></span><br><span class="line"># 开启防火墙</span><br><span class="line">sudo ufw enable</span><br><span class="line"></span><br><span class="line"># 设置防火墙禁用所有端口</span><br><span class="line">sudo ufw default deny</span><br><span class="line"></span><br><span class="line"># 设置防火墙开启特定端口 ( ssh:22 | http:80 | https: 443 )</span><br><span class="line">sudo ufw allow ssh</span><br><span class="line">sudo ufw allow http</span><br><span class="line">sudo ufw allow https</span><br></pre></td></tr></table></figure>
+
+<p>现在，浏览器只能通过 80 / 443 端口访问网站页面。<br>相信在你最喜爱的浏览器输入 <a href="http://demo.luqifu.tech/">http://demo.luqifu.tech</a> , 就能看到所部署的应用。<br>如果您希望为网站配置 HTTPS ( 443 ) 访问，请参考教程 <a href="/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/" title="在Nginx中为Node应用添加HTTPS访问">在Nginx中为Node应用添加HTTPS访问</a>。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>至此，本教程结束。</p>
+<p>这是我最近云端部署 Node 应用的一些心得，希望能帮到大家。</p>
+<p>非常感谢。</p>
+]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>Node.js</tag>
+        <tag>Nginx</tag>
+        <tag>DigitalOcean</tag>
+        <tag>Cloud Deployment</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Let&#39;s Encrypt在Nginx中为Node应用添加HTTPS访问</title>
+    <url>/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文讲述利用 Let’s Encrypt 生成 ssl 证书，将证书配置到 Nginx 反向代理，使 node.js 应用实现 https 访问。</p>
+<h2 id="什么是-http-协议？"><a href="#什么是-http-协议？" class="headerlink" title="什么是 http 协议？"></a>什么是 http 协议？</h2><p>HTTP ( HyperText Transfer Protocol )协议, 又称超文本传输协议, 是一种用于分布式、协作式和超媒体信息系统的应用层协议。它是一种用于分布式、协作式和超媒体信息系统的应用层协议，也是万维网的数据通信的基础。设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。通过 HTTP 或者 HTTPS 协议请求的资源由统一资源标识符（Uniform Resource Identifiers，URI）来标识。<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">来源: 维基百科</a></p>
+<h2 id="http-和-https-的区别"><a href="#http-和-https-的区别" class="headerlink" title="http 和 https 的区别"></a>http 和 https 的区别</h2><p>HTTP 协议传输的数据都是明文传输的，因此使用 HTTP 协议视为安全性不足。为了保证这些隐私数据能加密传输，网景公司设计了 SSL（Secure Sockets Layer）协议用于对 HTTP 协议传输的数据进行加密，从而就诞生了 HTTPS。简单来说，HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，要比 http 协议安全。</p>
+<blockquote>
+<p>HTTP 协议使用 80 端口，HTTPS 协议使用 443 端口。</p>
+</blockquote>
+<h2 id="关于-SSL-安全证书"><a href="#关于-SSL-安全证书" class="headerlink" title="关于 SSL 安全证书"></a>关于 SSL 安全证书</h2><p>要为网站实现 HTTPS 访问，我们需要一张具有公信力的 CA （ Certificate Authority ）也就是证书授权中心颁发的 SSL 安全证书，并且将它部署到你的网站服务器上。此教程将会使用 <code>Let&#39;s Encrypt &amp; Certbot</code> 生成 SSL 安全证书。</p>
+<blockquote>
+<p>Let’s Encrypt 是一个于 2015 年三季度推出的数字证书认证机构，旨在以自动化流程消除手动创建和安装证书的复杂流程，为安全网站提供免费的传输层安全性协议（TLS）证书。</p>
+</blockquote>
+<h2 id="为网站添加-HTTPS-访问"><a href="#为网站添加-HTTPS-访问" class="headerlink" title="为网站添加 HTTPS 访问"></a>为网站添加 HTTPS 访问</h2><blockquote>
+<p>这里，我将演示如何使用 Certbot 为 nginx 服务器添加 ssl 证书</p>
+</blockquote>
+<h3 id="一-访问-Certbot-官网-https-certbot-eff-org"><a href="#一-访问-Certbot-官网-https-certbot-eff-org" class="headerlink" title="(一) 访问 Certbot 官网 https://certbot.eff.org/"></a>(一) 访问 Certbot 官网 <a href="https://certbot.eff.org/">https://certbot.eff.org/</a></h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg"></p>
+<hr>
+<h3 id="二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。"><a href="#二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。" class="headerlink" title="(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。"></a>(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg"></p>
+<hr>
+<h3 id="（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><blockquote>
+<p><code>由于不同系统下，certbot 配置 ssl 证书方式不同。请务必根据 certbot 给出的指令执行。</code><br>本教程是在 <strong>ubuntu18.04.3</strong> 版本下使用 <strong>nginx</strong> 服务器，因此 Certbot 给出了下列指令:</p>
+</blockquote>
+<h4 id="1-SSH-远程登录到网站服务器"><a href="#1-SSH-远程登录到网站服务器" class="headerlink" title="1. SSH 远程登录到网站服务器"></a>1. SSH 远程登录到网站服务器</h4><p>使用 SSH 登录到部署网站的服务器，并且登录用户必须具有 sudo 权限。</p>
+<h4 id="2-添加-Certbot-PPA"><a href="#2-添加-Certbot-PPA" class="headerlink" title="2. 添加 Certbot PPA"></a>2. 添加 Certbot PPA</h4><p>在服务器上添加 Certbot PPA 到包列表，执行下列操作:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br><span class="line">sudo add-apt-repository universe</span><br><span class="line">sudo add-apt-repository ppa:certbot&#x2F;certbot</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-安装-Certbot"><a href="#3-安装-Certbot" class="headerlink" title="3. 安装 Certbot"></a>3. 安装 Certbot</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo apt-get install certbot python3-certbot-nginx</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-配置-SSL-证书到-nginx-服务器上"><a href="#4-配置-SSL-证书到-nginx-服务器上" class="headerlink" title="4. 配置 SSL 证书到 nginx 服务器上"></a>4. 配置 SSL 证书到 nginx 服务器上</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo certbot --nginx</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-检查证书自动更新功能"><a href="#5-检查证书自动更新功能" class="headerlink" title="5. 检查证书自动更新功能"></a>5. 检查证书自动更新功能</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># certbot生成的ssl证书，有效期为90天</span><br><span class="line"># 我们需要定期手动更新证书; 或者使用Unix系统下的定时任务工具cron定期执行</span><br><span class="line"></span><br><span class="line">sudo certbot renew --dry-run</span><br></pre></td></tr></table></figure>
+
+<h3 id="（四）-使用-https-访问您的网站"><a href="#（四）-使用-https-访问您的网站" class="headerlink" title="（四） 使用 https 访问您的网站"></a>（四） 使用 https 访问您的网站</h3><p>恭喜你，你已经可以使用 <a href="https://yourwebsite.com/">https://yourwebsite.com/</a> 访问您的网站 !</p>
+]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>Cloud Deployment</tag>
+        <tag>SSL</tag>
+        <tag>HTTP &amp; HTTPS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH公钥创建教程</title>
+    <url>/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
+<h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
+<h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
+<ul>
+<li><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code></li>
+<li><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></li>
+</ul>
+<h2 id="SSH-key-创建流程"><a href="#SSH-key-创建流程" class="headerlink" title="SSH key 创建流程"></a>SSH key 创建流程</h2><h3 id="（一）首先检查-ssh-client-是否已安装在系统中"><a href="#（一）首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="（一）首先检查 ssh client 是否已安装在系统中"></a>（一）首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台，输入 <code>ssh</code></p>
+<p>如果看见下列提示选项，则代表 ssh 命令可用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; ssh</span><br><span class="line">usage: ssh [-46Yy][-b bind_interface]</span><br><span class="line">[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file] [-e escape_char][-f configfile] [-I pkcs11][-i identity_file] [-J [user@]host[:port]][-l address]</span><br><span class="line">[-l login_name][-m mac_spec] [-O ctl_cmd][-o option] [-p port][-q query_option] [-R address][-s ctl_path] [-W host:port]-w local_tun[:remote_tun]] destination [command]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>如果 ssh 命令不可用，则按照下列指示安装 openssh 服务。</p>
+<h6 id="对于-window-用户："><a href="#对于-window-用户：" class="headerlink" title="对于 window 用户："></a>对于 window 用户：</h6><ul>
+<li>第一种方法： 进入 <code>设置</code>-<code>应用</code>-<code>应用和功能</code>-<code>管理可选功能</code>-<code>添加功能</code> - <code>安装 OpenSSH 服务器和客户端</code>，安装完成后重启电脑。</li>
+<li>第二种方法：从<a href="https://gitforwindows.org/">Git 官网</a>下载 <code>git</code> 和 <code>git bash</code>，使用 git bash 自带的 ssh 服务。</li>
+</ul>
+<h6 id="对于-mac-Unix-用户："><a href="#对于-mac-Unix-用户：" class="headerlink" title="对于 mac / Unix 用户："></a>对于 mac / Unix 用户：</h6><ul>
+<li>系统应该自带了 ssh 服务，我们可以直接使用 ssh-keygen 命令</li>
+</ul>
+<hr>
+<h3 id="（二）ssh-服务安装后，创建密钥："><a href="#（二）ssh-服务安装后，创建密钥：" class="headerlink" title="（二）ssh 服务安装后，创建密钥："></a>（二）ssh 服务安装后，创建密钥：</h3><p>打开本地控制台，输入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 指定 –t 选项 使用类型为rsa创建密钥对。</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+
+<p>密钥创建过程中，需要按下多次回车键, 即默认值创建。创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：</p>
+<ul>
+<li>Window 用户：<code>C:\Users\&#123;你的用户名&#125;\\.ssh</code></li>
+<li>Mac / Unix 用户： <code>~/.ssh</code></li>
+</ul>
+<p>进入<code>.ssh</code> 目录，就能看到刚刚创建的公钥文件<code>id_rsa.pub</code> 和 私钥文件<code>id_rsa</code>。<strong>切记，私钥文件不能外泄；公钥则根据实际需要，保存到带有 SSH server 的服务器中</strong>。</p>
+<h2 id="（三）结语："><a href="#（三）结语：" class="headerlink" title="（三）结语："></a>（三）结语：</h2><p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
+]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>SSH</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>创建DigitalOcean服务器实例Droplet</title>
+    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
+<h2 id="注册账户"><a href="#注册账户" class="headerlink" title="注册账户"></a>注册账户</h2><p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
+<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><hr>
+<h4 id="一-登录账户后-创建-new-project"><a href="#一-登录账户后-创建-new-project" class="headerlink" title="(一) 登录账户后, 创建 new project."></a>(一) 登录账户后, 创建 new project.</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="二-填写您的项目名称，描述和用途。"><a href="#二-填写您的项目名称，描述和用途。" class="headerlink" title="(二) 填写您的项目名称，描述和用途。"></a>(二) 填写您的项目名称，描述和用途。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg" alt="创建新项目"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg" alt="创建新项目"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg" alt="创建新项目"></p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h4><blockquote>
+<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
+</blockquote>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg" alt="创建新项目"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="六-自定义主机名，创建-Droplet"><a href="#六-自定义主机名，创建-Droplet" class="headerlink" title="(六) 自定义主机名，创建 Droplet"></a>(六) 自定义主机名，创建 Droplet</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="七-创建完成后，获取-Droplet-的公网-IP"><a href="#七-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="(七) 创建完成后，获取 Droplet 的公网 IP"></a>(七) 创建完成后，获取 Droplet 的公网 IP</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="八-检查云服务器是否激活"><a href="#八-检查云服务器是否激活" class="headerlink" title="(八) 检查云服务器是否激活"></a>(八) 检查云服务器是否激活</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg" alt="创建新项目"></p>
+<hr>
+<h4 id="九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。"><a href="#九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。" class="headerlink" title="(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。"></a>(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</h4>]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>DigitalOcean</tag>
+        <tag>Cloud Deployment</tag>
+        <tag>VPS</tag>
+      </tags>
+  </entry>
+</search>
