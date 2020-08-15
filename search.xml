@@ -92,6 +92,49 @@
       </tags>
   </entry>
   <entry>
+    <title>SSH公钥创建教程</title>
+    <url>/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
+<h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
+<h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
+<ul>
+<li><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code></li>
+<li><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></li>
+</ul>
+<h2 id="SSH-key-创建流程"><a href="#SSH-key-创建流程" class="headerlink" title="SSH key 创建流程"></a>SSH key 创建流程</h2><h3 id="（一）首先检查-ssh-client-是否已安装在系统中"><a href="#（一）首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="（一）首先检查 ssh client 是否已安装在系统中"></a>（一）首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台，输入 <code>ssh</code></p>
+<p>如果看见下列提示选项，则代表 ssh 命令可用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; ssh</span><br><span class="line">usage: ssh [-46Yy][-b bind_interface]</span><br><span class="line">[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file] [-e escape_char][-f configfile] [-I pkcs11][-i identity_file] [-J [user@]host[:port]][-l address]</span><br><span class="line">[-l login_name][-m mac_spec] [-O ctl_cmd][-o option] [-p port][-q query_option] [-R address][-s ctl_path] [-W host:port]-w local_tun[:remote_tun]] destination [command]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>如果 ssh 命令不可用，则按照下列指示安装 openssh 服务。</p>
+<h6 id="对于-window-用户："><a href="#对于-window-用户：" class="headerlink" title="对于 window 用户："></a>对于 window 用户：</h6><ul>
+<li>第一种方法： 进入 <code>设置</code>-<code>应用</code>-<code>应用和功能</code>-<code>管理可选功能</code>-<code>添加功能</code> - <code>安装 OpenSSH 服务器和客户端</code>，安装完成后重启电脑。</li>
+<li>第二种方法：从<a href="https://gitforwindows.org/">Git 官网</a>下载 <code>git</code> 和 <code>git bash</code>，使用 git bash 自带的 ssh 服务。</li>
+</ul>
+<h6 id="对于-mac-Unix-用户："><a href="#对于-mac-Unix-用户：" class="headerlink" title="对于 mac / Unix 用户："></a>对于 mac / Unix 用户：</h6><ul>
+<li>系统应该自带了 ssh 服务，我们可以直接使用 ssh-keygen 命令</li>
+</ul>
+<hr>
+<h3 id="（二）ssh-服务安装后，创建密钥："><a href="#（二）ssh-服务安装后，创建密钥：" class="headerlink" title="（二）ssh 服务安装后，创建密钥："></a>（二）ssh 服务安装后，创建密钥：</h3><p>打开本地控制台，输入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 指定 –t 选项 使用类型为rsa创建密钥对。</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+
+<p>密钥创建过程中，需要按下多次回车键, 即默认值创建。创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：</p>
+<ul>
+<li>Window 用户：<code>C:\Users\&#123;你的用户名&#125;\\.ssh</code></li>
+<li>Mac / Unix 用户： <code>~/.ssh</code></li>
+</ul>
+<p>进入<code>.ssh</code> 目录，就能看到刚刚创建的公钥文件<code>id_rsa.pub</code> 和 私钥文件<code>id_rsa</code>。<strong>切记，私钥文件不能外泄；公钥则根据实际需要，保存到带有 SSH server 的服务器中</strong>。</p>
+<h2 id="（三）结语："><a href="#（三）结语：" class="headerlink" title="（三）结语："></a>（三）结语：</h2><p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
+]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>SSH</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用Let&#39;s Encrypt在Nginx中为Node应用添加HTTPS访问</title>
     <url>/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文讲述利用 Let’s Encrypt 生成 ssl 证书，将证书配置到 Nginx 反向代理，使 node.js 应用实现 https 访问。</p>
@@ -171,49 +214,6 @@
         <tag>DigitalOcean</tag>
         <tag>Cloud Deployment</tag>
         <tag>VPS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSH公钥创建教程</title>
-    <url>/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
-<h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
-<h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
-<ul>
-<li><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code></li>
-<li><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></li>
-</ul>
-<h2 id="SSH-key-创建流程"><a href="#SSH-key-创建流程" class="headerlink" title="SSH key 创建流程"></a>SSH key 创建流程</h2><h3 id="（一）首先检查-ssh-client-是否已安装在系统中"><a href="#（一）首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="（一）首先检查 ssh client 是否已安装在系统中"></a>（一）首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台，输入 <code>ssh</code></p>
-<p>如果看见下列提示选项，则代表 ssh 命令可用</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; ssh</span><br><span class="line">usage: ssh [-46Yy][-b bind_interface]</span><br><span class="line">[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file] [-e escape_char][-f configfile] [-I pkcs11][-i identity_file] [-J [user@]host[:port]][-l address]</span><br><span class="line">[-l login_name][-m mac_spec] [-O ctl_cmd][-o option] [-p port][-q query_option] [-R address][-s ctl_path] [-W host:port]-w local_tun[:remote_tun]] destination [command]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>如果 ssh 命令不可用，则按照下列指示安装 openssh 服务。</p>
-<h6 id="对于-window-用户："><a href="#对于-window-用户：" class="headerlink" title="对于 window 用户："></a>对于 window 用户：</h6><ul>
-<li>第一种方法： 进入 <code>设置</code>-<code>应用</code>-<code>应用和功能</code>-<code>管理可选功能</code>-<code>添加功能</code> - <code>安装 OpenSSH 服务器和客户端</code>，安装完成后重启电脑。</li>
-<li>第二种方法：从<a href="https://gitforwindows.org/">Git 官网</a>下载 <code>git</code> 和 <code>git bash</code>，使用 git bash 自带的 ssh 服务。</li>
-</ul>
-<h6 id="对于-mac-Unix-用户："><a href="#对于-mac-Unix-用户：" class="headerlink" title="对于 mac / Unix 用户："></a>对于 mac / Unix 用户：</h6><ul>
-<li>系统应该自带了 ssh 服务，我们可以直接使用 ssh-keygen 命令</li>
-</ul>
-<hr>
-<h3 id="（二）ssh-服务安装后，创建密钥："><a href="#（二）ssh-服务安装后，创建密钥：" class="headerlink" title="（二）ssh 服务安装后，创建密钥："></a>（二）ssh 服务安装后，创建密钥：</h3><p>打开本地控制台，输入</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 指定 –t 选项 使用类型为rsa创建密钥对。</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
-
-<p>密钥创建过程中，需要按下多次回车键, 即默认值创建。创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：</p>
-<ul>
-<li>Window 用户：<code>C:\Users\&#123;你的用户名&#125;\\.ssh</code></li>
-<li>Mac / Unix 用户： <code>~/.ssh</code></li>
-</ul>
-<p>进入<code>.ssh</code> 目录，就能看到刚刚创建的公钥文件<code>id_rsa.pub</code> 和 私钥文件<code>id_rsa</code>。<strong>切记，私钥文件不能外泄；公钥则根据实际需要，保存到带有 SSH server 的服务器中</strong>。</p>
-<h2 id="（三）结语："><a href="#（三）结语：" class="headerlink" title="（三）结语："></a>（三）结语：</h2><p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
-]]></content>
-      <categories>
-        <category>Cloud Deployment</category>
-      </categories>
-      <tags>
-        <tag>SSH</tag>
-        <tag>Linux</tag>
       </tags>
   </entry>
 </search>
