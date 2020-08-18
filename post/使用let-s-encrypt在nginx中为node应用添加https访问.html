@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg">
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg">
 <meta property="article:published_time" content="2020-08-13T01:41:48.000Z">
-<meta property="article:modified_time" content="2020-08-15T04:43:02.821Z">
+<meta property="article:modified_time" content="2020-08-18T12:51:10.167Z">
 <meta property="article:author" content="Qifu LU">
 <meta property="article:tag" content="Nginx">
 <meta property="article:tag" content="Cloud Deployment">
@@ -213,7 +213,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
-          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-http-%E5%8D%8F%E8%AE%AE%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什么是 http 协议？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http-%E5%92%8C-https-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">http 和 https 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-SSL-%E5%AE%89%E5%85%A8%E8%AF%81%E4%B9%A6"><span class="nav-number">4.</span> <span class="nav-text">关于 SSL 安全证书</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E7%BD%91%E7%AB%99%E6%B7%BB%E5%8A%A0-HTTPS-%E8%AE%BF%E9%97%AE"><span class="nav-number">5.</span> <span class="nav-text">为网站添加 HTTPS 访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-%E8%AE%BF%E9%97%AE-Certbot-%E5%AE%98%E7%BD%91-https-certbot-eff-org"><span class="nav-number">5.1.</span> <span class="nav-text">(一) 访问 Certbot 官网 https:&#x2F;&#x2F;certbot.eff.org&#x2F;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-Certbot-%E5%B0%86%E5%9F%BA%E4%BA%8E%E6%82%A8%E7%9A%84-HTTP-server-%E7%B1%BB%E5%9E%8B-%E4%BB%A5%E5%8F%8A-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%8C%E4%B8%BA%E4%BD%A0%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E5%AE%89%E8%A3%85%E6%96%B9%E6%A1%88%E3%80%82"><span class="nav-number">5.2.</span> <span class="nav-text">(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%89%EF%BC%89%E6%8C%89%E7%85%A7-Cerbot-%E5%AE%98%E7%BD%91%E7%BB%99%E5%87%BA%E7%9A%84%E6%8C%87%E4%BB%A4%EF%BC%8C%E4%B8%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-ssl-%E8%AF%81%E4%B9%A6%E3%80%82"><span class="nav-number">5.3.</span> <span class="nav-text">（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SSH-%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E5%88%B0%E7%BD%91%E7%AB%99%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">5.3.1.</span> <span class="nav-text">1. SSH 远程登录到网站服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%B7%BB%E5%8A%A0-Certbot-PPA"><span class="nav-number">5.3.2.</span> <span class="nav-text">2. 添加 Certbot PPA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85-Certbot"><span class="nav-number">5.3.3.</span> <span class="nav-text">3. 安装 Certbot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE-SSL-%E8%AF%81%E4%B9%A6%E5%88%B0-nginx-%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A"><span class="nav-number">5.3.4.</span> <span class="nav-text">4. 配置 SSL 证书到 nginx 服务器上</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%A3%80%E6%9F%A5%E8%AF%81%E4%B9%A6%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0%E5%8A%9F%E8%83%BD"><span class="nav-number">5.3.5.</span> <span class="nav-text">5. 检查证书自动更新功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E5%9B%9B%EF%BC%89-%E4%BD%BF%E7%94%A8-https-%E8%AE%BF%E9%97%AE%E6%82%A8%E7%9A%84%E7%BD%91%E7%AB%99"><span class="nav-number">5.4.</span> <span class="nav-text">（四） 使用 https 访问您的网站</span></a></li></ol></li></ol></div>
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-http-%E5%8D%8F%E8%AE%AE%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什么是 http 协议？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http-%E5%92%8C-https-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">http 和 https 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-SSL-%E5%AE%89%E5%85%A8%E8%AF%81%E4%B9%A6"><span class="nav-number">4.</span> <span class="nav-text">关于 SSL 安全证书</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E7%BD%91%E7%AB%99%E6%B7%BB%E5%8A%A0-HTTPS-%E8%AE%BF%E9%97%AE"><span class="nav-number">5.</span> <span class="nav-text">为网站添加 HTTPS 访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-%E8%AE%BF%E9%97%AE-Certbot-%E5%AE%98%E7%BD%91-https-certbot-eff-org"><span class="nav-number">5.1.</span> <span class="nav-text">(一) 访问 Certbot 官网 https:&#x2F;&#x2F;certbot.eff.org&#x2F;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-Certbot-%E5%B0%86%E5%9F%BA%E4%BA%8E%E6%82%A8%E7%9A%84-HTTP-server-%E7%B1%BB%E5%9E%8B-%E4%BB%A5%E5%8F%8A-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%8C%E4%B8%BA%E4%BD%A0%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E5%AE%89%E8%A3%85%E6%96%B9%E6%A1%88%E3%80%82"><span class="nav-number">5.2.</span> <span class="nav-text">(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89-%E6%8C%89%E7%85%A7-Cerbot-%E5%AE%98%E7%BD%91%E7%BB%99%E5%87%BA%E7%9A%84%E6%8C%87%E4%BB%A4%EF%BC%8C%E4%B8%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-ssl-%E8%AF%81%E4%B9%A6%E3%80%82"><span class="nav-number">5.3.</span> <span class="nav-text">(三) 按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SSH-%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E5%88%B0%E7%BD%91%E7%AB%99%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">5.3.1.</span> <span class="nav-text">1. SSH 远程登录到网站服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%B7%BB%E5%8A%A0-Certbot-PPA"><span class="nav-number">5.3.2.</span> <span class="nav-text">2. 添加 Certbot PPA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85-Certbot"><span class="nav-number">5.3.3.</span> <span class="nav-text">3. 安装 Certbot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE-SSL-%E8%AF%81%E4%B9%A6%E5%88%B0-nginx-%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A"><span class="nav-number">5.3.4.</span> <span class="nav-text">4. 配置 SSL 证书到 nginx 服务器上</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%A3%80%E6%9F%A5%E8%AF%81%E4%B9%A6%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0%E5%8A%9F%E8%83%BD"><span class="nav-number">5.3.5.</span> <span class="nav-text">5. 检查证书自动更新功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E5%9B%9B%EF%BC%89-%E4%BD%BF%E7%94%A8-https-%E8%AE%BF%E9%97%AE%E6%82%A8%E7%9A%84%E7%BD%91%E7%AB%99"><span class="nav-number">5.4.</span> <span class="nav-text">（四） 使用 https 访问您的网站</span></a></li></ol></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -227,7 +227,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：7.9k</span>
+    <span title="站点总字数">字数共计：7.6k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
@@ -348,7 +348,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-15 14:43:02" itemprop="dateModified" datetime="2020-08-15T14:43:02+10:00">2020-08-15</time>
+                <time title="修改时间：2020-08-18 22:51:10" itemprop="dateModified" datetime="2020-08-18T22:51:10+10:00">2020-08-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -406,7 +406,7 @@
 <hr>
 <h3 id="二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。"><a href="#二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。" class="headerlink" title="(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。"></a>(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg"></p>
 <hr>
-<h3 id="（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><blockquote>
+<h3 id="三-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#三-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="(三) 按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>(三) 按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><blockquote>
 <p><code>由于不同系统下，certbot 配置 ssl 证书方式不同。请务必根据 certbot 给出的指令执行。</code><br>本教程是在 <strong>ubuntu18.04.3</strong> 版本下使用 <strong>nginx</strong> 服务器，因此 Certbot 给出了下列指令:</p>
 </blockquote>
 <h4 id="1-SSH-远程登录到网站服务器"><a href="#1-SSH-远程登录到网站服务器" class="headerlink" title="1. SSH 远程登录到网站服务器"></a>1. SSH 远程登录到网站服务器</h4><p>使用 SSH 登录到部署网站的服务器，并且登录用户必须具有 sudo 权限。</p>
@@ -558,7 +558,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：7.9k</span>
+    <span title="站点总字数">字数共计：7.6k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
