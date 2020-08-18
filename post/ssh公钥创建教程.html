@@ -23,26 +23,21 @@
     var CONFIG = {"hostname":"www.luqifu.tech","root":"/","scheme":"Muse","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
-  <meta name="description" content="本文讲述利用Let&#39;s Encrypt生成ssl证书，将证书配置到Nginx反向代理，使node.js应用实现https访问。">
+  <meta name="description" content="本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用Let&#39;s Encrypt在Nginx中为Node应用添加HTTPS访问">
-<meta property="og:url" content="https://www.luqifu.tech/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/index.html">
+<meta property="og:title" content="SSH公钥创建教程">
+<meta property="og:url" content="https://www.luqifu.tech/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html">
 <meta property="og:site_name" content="富仔的技术博">
-<meta property="og:description" content="本文讲述利用Let&#39;s Encrypt生成ssl证书，将证书配置到Nginx反向代理，使node.js应用实现https访问。">
+<meta property="og:description" content="本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg">
-<meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg">
-<meta property="article:published_time" content="2020-08-13T01:41:48.000Z">
-<meta property="article:modified_time" content="2020-08-15T04:43:02.821Z">
+<meta property="article:published_time" content="2020-08-13T01:04:01.000Z">
+<meta property="article:modified_time" content="2020-08-15T05:29:10.487Z">
 <meta property="article:author" content="Qifu LU">
-<meta property="article:tag" content="Nginx">
-<meta property="article:tag" content="Cloud Deployment">
-<meta property="article:tag" content="SSL">
-<meta property="article:tag" content="HTTP &amp; HTTPS">
+<meta property="article:tag" content="SSH">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg">
 
-<link rel="canonical" href="https://www.luqifu.tech/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/">
+<link rel="canonical" href="https://www.luqifu.tech/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html">
 
 
 <script class="page-configurations">
@@ -55,7 +50,7 @@
   };
 </script>
 
-  <title>使用Let's Encrypt在Nginx中为Node应用添加HTTPS访问 | 富仔的技术博</title>
+  <title>SSH公钥创建教程 | 富仔的技术博</title>
   
 
 
@@ -212,7 +207,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
-          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-http-%E5%8D%8F%E8%AE%AE%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什么是 http 协议？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http-%E5%92%8C-https-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">http 和 https 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-SSL-%E5%AE%89%E5%85%A8%E8%AF%81%E4%B9%A6"><span class="nav-number">4.</span> <span class="nav-text">关于 SSL 安全证书</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E7%BD%91%E7%AB%99%E6%B7%BB%E5%8A%A0-HTTPS-%E8%AE%BF%E9%97%AE"><span class="nav-number">5.</span> <span class="nav-text">为网站添加 HTTPS 访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-%E8%AE%BF%E9%97%AE-Certbot-%E5%AE%98%E7%BD%91-https-certbot-eff-org"><span class="nav-number">5.1.</span> <span class="nav-text">(一) 访问 Certbot 官网 https:&#x2F;&#x2F;certbot.eff.org&#x2F;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-Certbot-%E5%B0%86%E5%9F%BA%E4%BA%8E%E6%82%A8%E7%9A%84-HTTP-server-%E7%B1%BB%E5%9E%8B-%E4%BB%A5%E5%8F%8A-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%8C%E4%B8%BA%E4%BD%A0%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E5%AE%89%E8%A3%85%E6%96%B9%E6%A1%88%E3%80%82"><span class="nav-number">5.2.</span> <span class="nav-text">(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%89%EF%BC%89%E6%8C%89%E7%85%A7-Cerbot-%E5%AE%98%E7%BD%91%E7%BB%99%E5%87%BA%E7%9A%84%E6%8C%87%E4%BB%A4%EF%BC%8C%E4%B8%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-ssl-%E8%AF%81%E4%B9%A6%E3%80%82"><span class="nav-number">5.3.</span> <span class="nav-text">（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SSH-%E8%BF%9C%E7%A8%8B%E7%99%BB%E5%BD%95%E5%88%B0%E7%BD%91%E7%AB%99%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">5.3.1.</span> <span class="nav-text">1. SSH 远程登录到网站服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%B7%BB%E5%8A%A0-Certbot-PPA"><span class="nav-number">5.3.2.</span> <span class="nav-text">2. 添加 Certbot PPA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85-Certbot"><span class="nav-number">5.3.3.</span> <span class="nav-text">3. 安装 Certbot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE-SSL-%E8%AF%81%E4%B9%A6%E5%88%B0-nginx-%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A"><span class="nav-number">5.3.4.</span> <span class="nav-text">4. 配置 SSL 证书到 nginx 服务器上</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%A3%80%E6%9F%A5%E8%AF%81%E4%B9%A6%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0%E5%8A%9F%E8%83%BD"><span class="nav-number">5.3.5.</span> <span class="nav-text">5. 检查证书自动更新功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E5%9B%9B%EF%BC%89-%E4%BD%BF%E7%94%A8-https-%E8%AE%BF%E9%97%AE%E6%82%A8%E7%9A%84%E7%BD%91%E7%AB%99"><span class="nav-number">5.4.</span> <span class="nav-text">（四） 使用 https 访问您的网站</span></a></li></ol></li></ol></div>
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-SSH-Keys"><span class="nav-number">2.</span> <span class="nav-text">为什么需要 SSH Keys ?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-ssh-keygen"><span class="nav-number">3.</span> <span class="nav-text">什么是 ssh-keygen ?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH-key-%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">SSH key 创建流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%B8%80%EF%BC%89%E9%A6%96%E5%85%88%E6%A3%80%E6%9F%A5-ssh-client-%E6%98%AF%E5%90%A6%E5%B7%B2%E5%AE%89%E8%A3%85%E5%9C%A8%E7%B3%BB%E7%BB%9F%E4%B8%AD"><span class="nav-number">4.1.</span> <span class="nav-text">（一）首先检查 ssh client 是否已安装在系统中</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-window-%E7%94%A8%E6%88%B7%EF%BC%9A"><span class="nav-number">4.1.0.0.1.</span> <span class="nav-text">对于 window 用户：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-mac-Unix-%E7%94%A8%E6%88%B7%EF%BC%9A"><span class="nav-number">4.1.0.0.2.</span> <span class="nav-text">对于 mac &#x2F; Unix 用户：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%88%E4%BA%8C%EF%BC%89ssh-%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85%E5%90%8E%EF%BC%8C%E5%88%9B%E5%BB%BA%E5%AF%86%E9%92%A5%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">（二）ssh 服务安装后，创建密钥：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E4%B8%89%EF%BC%89%E7%BB%93%E8%AF%AD%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">（三）结语：</span></a></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -226,26 +221,26 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：3.7k</span>
+    <span title="站点总字数">字数共计：7.9k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -312,7 +307,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.luqifu.tech/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/">
+    <link itemprop="mainEntityOfPage" href="https://www.luqifu.tech/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://luqifu.com/img/avatar.jpg">
@@ -327,7 +322,7 @@
     
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          使用Let's Encrypt在Nginx中为Node应用添加HTTPS访问
+          SSH公钥创建教程
         </h1>
 
         <div class="post-meta">
@@ -337,14 +332,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-08-13 11:41:48" itemprop="dateCreated datePublished" datetime="2020-08-13T11:41:48+10:00">2020-08-13</time>
+              <time title="创建时间：2020-08-13 11:04:01" itemprop="dateCreated datePublished" datetime="2020-08-13T11:04:01+10:00">2020-08-13</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-15 14:43:02" itemprop="dateModified" datetime="2020-08-15T14:43:02+10:00">2020-08-15</time>
+                <time title="修改时间：2020-08-15 15:29:10" itemprop="dateModified" datetime="2020-08-15T15:29:10+10:00">2020-08-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -369,7 +364,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>824</span>
+              <span>884</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -385,38 +380,56 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文讲述利用 Let’s Encrypt 生成 ssl 证书，将证书配置到 Nginx 反向代理，使 node.js 应用实现 https 访问。</p>
-<h2 id="什么是-http-协议？"><a href="#什么是-http-协议？" class="headerlink" title="什么是 http 协议？"></a>什么是 http 协议？</h2><p>HTTP ( HyperText Transfer Protocol )协议, 又称超文本传输协议, 是一种用于分布式、协作式和超媒体信息系统的应用层协议。它是一种用于分布式、协作式和超媒体信息系统的应用层协议，也是万维网的数据通信的基础。设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。通过 HTTP 或者 HTTPS 协议请求的资源由统一资源标识符（Uniform Resource Identifiers，URI）来标识。<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">来源: 维基百科</a></p>
-<h2 id="http-和-https-的区别"><a href="#http-和-https-的区别" class="headerlink" title="http 和 https 的区别"></a>http 和 https 的区别</h2><p>HTTP 协议传输的数据都是明文传输的，因此使用 HTTP 协议视为安全性不足。为了保证这些隐私数据能加密传输，网景公司设计了 SSL（Secure Sockets Layer）协议用于对 HTTP 协议传输的数据进行加密，从而就诞生了 HTTPS。简单来说，HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，要比 http 协议安全。</p>
-<blockquote>
-<p>HTTP 协议使用 80 端口，HTTPS 协议使用 443 端口。</p>
-</blockquote>
-<h2 id="关于-SSL-安全证书"><a href="#关于-SSL-安全证书" class="headerlink" title="关于 SSL 安全证书"></a>关于 SSL 安全证书</h2><p>要为网站实现 HTTPS 访问，我们需要一张具有公信力的 CA （ Certificate Authority ）也就是证书授权中心颁发的 SSL 安全证书，并且将它部署到你的网站服务器上。此教程将会使用 <code>Let&#39;s Encrypt &amp; Certbot</code> 生成 SSL 安全证书。</p>
-<blockquote>
-<p>Let’s Encrypt 是一个于 2015 年三季度推出的数字证书认证机构，旨在以自动化流程消除手动创建和安装证书的复杂流程，为安全网站提供免费的传输层安全性协议（TLS）证书。</p>
-</blockquote>
-<h2 id="为网站添加-HTTPS-访问"><a href="#为网站添加-HTTPS-访问" class="headerlink" title="为网站添加 HTTPS 访问"></a>为网站添加 HTTPS 访问</h2><blockquote>
-<p>这里，我将演示如何使用 Certbot 为 nginx 服务器添加 ssl 证书</p>
-</blockquote>
-<h3 id="一-访问-Certbot-官网-https-certbot-eff-org"><a href="#一-访问-Certbot-官网-https-certbot-eff-org" class="headerlink" title="(一) 访问 Certbot 官网 https://certbot.eff.org/"></a>(一) 访问 Certbot 官网 <a target="_blank" rel="noopener" href="https://certbot.eff.org/">https://certbot.eff.org/</a></h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg"></p>
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
+<h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
+<h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
+<ul>
+<li><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code></li>
+<li><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></li>
+</ul>
+<h2 id="SSH-key-创建流程"><a href="#SSH-key-创建流程" class="headerlink" title="SSH key 创建流程"></a>SSH key 创建流程</h2><h3 id="（一）首先检查-ssh-client-是否已安装在系统中"><a href="#（一）首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="（一）首先检查 ssh client 是否已安装在系统中"></a>（一）首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台，输入 <code>ssh</code></p>
+<p>如果看见下列提示选项，则代表 ssh 命令可用</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; ssh</span><br><span class="line">usage: ssh [-46Yy][-b bind_interface]</span><br><span class="line">[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file] [-e escape_char][-f configfile] [-I pkcs11][-i identity_file] [-J [user@]host[:port]][-l address]</span><br><span class="line">[-l login_name][-m mac_spec] [-O ctl_cmd][-o option] [-p port][-q query_option] [-R address][-s ctl_path] [-W host:port]-w local_tun[:remote_tun]] destination [command]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
-<h3 id="二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。"><a href="#二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。" class="headerlink" title="(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。"></a>(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg"></p>
+<p>如果 ssh 命令不可用，则按照下列指示安装 openssh 服务。</p>
+<h6 id="对于-window-用户："><a href="#对于-window-用户：" class="headerlink" title="对于 window 用户："></a>对于 window 用户：</h6><ul>
+<li>第一种方法： 进入 <code>设置</code>-<code>应用</code>-<code>应用和功能</code>-<code>管理可选功能</code>-<code>添加功能</code> - <code>安装 OpenSSH 服务器和客户端</code>，安装完成后重启电脑。</li>
+<li>第二种方法：从<a target="_blank" rel="noopener" href="https://gitforwindows.org/">Git 官网</a>下载 <code>git</code> 和 <code>git bash</code>，使用 git bash 自带的 ssh 服务。</li>
+</ul>
+<h6 id="对于-mac-Unix-用户："><a href="#对于-mac-Unix-用户：" class="headerlink" title="对于 mac / Unix 用户："></a>对于 mac / Unix 用户：</h6><ul>
+<li>系统应该自带了 ssh 服务，我们可以直接使用 ssh-keygen 命令</li>
+</ul>
 <hr>
-<h3 id="（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#（三）按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>（三）按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><blockquote>
-<p><code>由于不同系统下，certbot 配置 ssl 证书方式不同。请务必根据 certbot 给出的指令执行。</code><br>本教程是在 <strong>ubuntu18.04.3</strong> 版本下使用 <strong>nginx</strong> 服务器，因此 Certbot 给出了下列指令:</p>
-</blockquote>
-<h4 id="1-SSH-远程登录到网站服务器"><a href="#1-SSH-远程登录到网站服务器" class="headerlink" title="1. SSH 远程登录到网站服务器"></a>1. SSH 远程登录到网站服务器</h4><p>使用 SSH 登录到部署网站的服务器，并且登录用户必须具有 sudo 权限。</p>
-<h4 id="2-添加-Certbot-PPA"><a href="#2-添加-Certbot-PPA" class="headerlink" title="2. 添加 Certbot PPA"></a>2. 添加 Certbot PPA</h4><p>在服务器上添加 Certbot PPA 到包列表，执行下列操作:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br><span class="line">sudo add-apt-repository universe</span><br><span class="line">sudo add-apt-repository ppa:certbot&#x2F;certbot</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+<h3 id="（二）ssh-服务安装后，创建密钥："><a href="#（二）ssh-服务安装后，创建密钥：" class="headerlink" title="（二）ssh 服务安装后，创建密钥："></a>（二）ssh 服务安装后，创建密钥：</h3><p>打开本地控制台，输入</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 指定 –t 选项 使用类型为rsa创建密钥对。</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></tbody></table></figure>
 
-<h4 id="3-安装-Certbot"><a href="#3-安装-Certbot" class="headerlink" title="3. 安装 Certbot"></a>3. 安装 Certbot</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install certbot python3-certbot-nginx</span><br></pre></td></tr></table></figure>
-
-<h4 id="4-配置-SSL-证书到-nginx-服务器上"><a href="#4-配置-SSL-证书到-nginx-服务器上" class="headerlink" title="4. 配置 SSL 证书到 nginx 服务器上"></a>4. 配置 SSL 证书到 nginx 服务器上</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo certbot --nginx</span><br></pre></td></tr></table></figure>
-
-<h4 id="5-检查证书自动更新功能"><a href="#5-检查证书自动更新功能" class="headerlink" title="5. 检查证书自动更新功能"></a>5. 检查证书自动更新功能</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># certbot生成的ssl证书，有效期为90天</span><br><span class="line"># 我们需要定期手动更新证书; 或者使用Unix系统下的定时任务工具cron定期执行</span><br><span class="line"></span><br><span class="line">sudo certbot renew --dry-run</span><br></pre></td></tr></table></figure>
-
-<h3 id="（四）-使用-https-访问您的网站"><a href="#（四）-使用-https-访问您的网站" class="headerlink" title="（四） 使用 https 访问您的网站"></a>（四） 使用 https 访问您的网站</h3><p>恭喜你，你已经可以使用 <a target="_blank" rel="noopener" href="https://yourwebsite.com/">https://yourwebsite.com/</a> 访问您的网站 !</p>
-
+<p>密钥创建过程中，需要按下多次回车键, 即默认值创建。创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：</p>
+<ul>
+<li>Window 用户：<code>C:\Users\{你的用户名}\\.ssh</code></li>
+<li>Mac / Unix 用户： <code>~/.ssh</code></li>
+</ul>
+<p>进入<code>.ssh</code> 目录，就能看到刚刚创建的公钥文件<code>id_rsa.pub</code> 和 私钥文件<code>id_rsa</code>。<strong>切记，私钥文件不能外泄；公钥则根据实际需要，保存到带有 SSH server 的服务器中</strong>。</p>
+<h2 id="（三）结语："><a href="#（三）结语：" class="headerlink" title="（三）结语："></a>（三）结语：</h2><p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
     </div>
 
     
@@ -431,7 +444,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://www.luqifu.tech/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE/" title="使用Let&#39;s Encrypt在Nginx中为Node应用添加HTTPS访问">https://www.luqifu.tech/post/使用let-s-encrypt在nginx中为node应用添加https访问/</a>
+    <a href="https://www.luqifu.tech/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建教程">https://www.luqifu.tech/post/ssh公钥创建教程.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -442,10 +455,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Nginx/" rel="tag"><i class="fa fa-tag"></i> Nginx</a>
-              <a href="/tags/Cloud-Deployment/" rel="tag"><i class="fa fa-tag"></i> Cloud Deployment</a>
-              <a href="/tags/SSL/" rel="tag"><i class="fa fa-tag"></i> SSL</a>
-              <a href="/tags/HTTP-HTTPS/" rel="tag"><i class="fa fa-tag"></i> HTTP & HTTPS</a>
+              <a href="/tags/SSH/" rel="tag"><i class="fa fa-tag"></i> SSH</a>
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
           </div>
 
         
@@ -454,10 +465,13 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet/" rel="prev" title="创建DigitalOcean服务器实例Droplet">
-      <i class="fa fa-chevron-left"></i> 创建DigitalOcean服务器实例Droplet
+    <a href="/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88.html" rel="prev" title="DigitalOcean, Node.js, Nginx, PM2整合部署方案">
+      <i class="fa fa-chevron-left"></i> DigitalOcean, Node.js, Nginx, PM2整合部署方案
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html" rel="next" title="创建DigitalOcean服务器实例Droplet">
+      创建DigitalOcean服务器实例Droplet <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -514,7 +528,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：3.7k</span>
+    <span title="站点总字数">字数共计：7.9k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
