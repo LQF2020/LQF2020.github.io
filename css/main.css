@@ -3016,7 +3016,7 @@ mark.search-keyword {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #4da632;
+  background: #0a88ff;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
