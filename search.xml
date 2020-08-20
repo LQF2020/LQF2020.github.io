@@ -4,14 +4,14 @@
     <title>DigitalOcean, Node.js, Nginx, PM2整合部署方案</title>
     <url>/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过阅读本教程，你将会学习如何将 Node.js 应用部署到云端服务器 DigitalOcean 中，并整合 SSH 登录， Nginx 作为反向代理，PM2 进程管理器， 防火墙端口配置的相关知识。</p>
-<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><p>(1) 购买自定义域名。尚未拥有域名，可前往 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 或者 其他域名提供商注册。<br>(2) 创建 SSH 连接的公私钥。尚未拥有公钥，前往 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。<br>(3) 创建一台云服务器（VPS）。本教程使用 DigitalOcean 创建。尚未拥有 VPS, 前往 <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html" title="DigitalOcean服务器创建">DigitalOcean服务器创建</a> 教程。</p>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><p>(1) 购买自定义域名。尚未拥有域名，可前往 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 或者 其他域名提供商注册。<br>(2) 创建 SSH 连接的公私钥。尚未拥有公钥，前往 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。<br>(3) 创建一台云服务器（VPS）。本教程使用 DigitalOcean 创建。尚未拥有 VPS, 前往 <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html" title="DigitalOcean服务器创建">DigitalOcean服务器创建</a> 教程。</p>
 <h2 id="教程用例"><a href="#教程用例" class="headerlink" title="教程用例"></a>教程用例</h2><p>网站域名<br>demo.luqifu.tech<br>云服务器<br>161.35.59.204 - Ubuntu18.04.3</p>
 <h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><p>(1) SSH 远程登录 DigitalOcean 云服务器<br>(2) 创建一个 Node.js 应用<br>(3) 安装并使用 Node 应用管理器 PM2<br>(4) DNS 域名和服务器 IP 绑定<br>(5) Nginx 下载，进行反向代理配置</p>
 <hr>
 <h4 id="（1）SSH-远程登录-DigitalOcean-云服务器"><a href="#（1）SSH-远程登录-DigitalOcean-云服务器" class="headerlink" title="（1）SSH 远程登录 DigitalOcean 云服务器"></a>（1）SSH 远程登录 DigitalOcean 云服务器</h4><p>本地控制台输入</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">ssh root@xxx.xxx.xxx.xxx <span class="comment"># 这里，我输入 ssh root@161.35.59.204</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>登陆方式有两种，密码登录 和 SSH keys 登录，我们更推荐后者，后者更方便和安全。<br>如何创建属于您的 SSH 公钥对，请参考教程 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a>。</p>
+<p>登陆方式有两种，密码登录 和 SSH keys 登录，我们更推荐后者，后者更方便和安全。<br>如何创建属于您的 SSH 公钥对，请参考教程 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a>。</p>
 <p>成功登录后，界面如下：</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">ssh root@161.35.59.204</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Last login: Wed Aug 12 01:57:51 2020</span><br><span class="line">root@my-node-server:~<span class="comment">#</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -165,63 +165,8 @@
       </tags>
   </entry>
   <entry>
-    <title>创建DigitalOcean服务器实例Droplet</title>
-    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
-    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
-<h2 id="注册账户"><a href="#注册账户" class="headerlink" title="注册账户"></a>注册账户</h2><p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
-<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><hr>
-<h4 id="一-登录账户后-创建-new-project"><a href="#一-登录账户后-创建-new-project" class="headerlink" title="(一) 登录账户后, 创建 new project."></a>(一) 登录账户后, 创建 new project.</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
-<hr>
-<h4 id="二-填写您的项目名称，描述和用途。"><a href="#二-填写您的项目名称，描述和用途。" class="headerlink" title="(二) 填写您的项目名称，描述和用途。"></a>(二) 填写您的项目名称，描述和用途。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
-<hr>
-<h4 id="三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
-<hr>
-<h4 id="四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
-<hr>
-<h4 id="五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h4><blockquote>
-<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
-</blockquote>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
-<hr>
-<h4 id="六-自定义主机名，创建-Droplet"><a href="#六-自定义主机名，创建-Droplet" class="headerlink" title="(六) 自定义主机名，创建 Droplet"></a>(六) 自定义主机名，创建 Droplet</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
-<hr>
-<h4 id="七-创建完成后，获取-Droplet-的公网-IP"><a href="#七-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="(七) 创建完成后，获取 Droplet 的公网 IP"></a>(七) 创建完成后，获取 Droplet 的公网 IP</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
-<hr>
-<h4 id="八-检查云服务器是否激活"><a href="#八-检查云服务器是否激活" class="headerlink" title="(八) 检查云服务器是否激活"></a>(八) 检查云服务器是否激活</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
-<hr>
-<h4 id="九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。"><a href="#九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。" class="headerlink" title="(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。"></a>(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</h4><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Cloud Deployment</category>
-      </categories>
-      <tags>
-        <tag>DigitalOcean</tag>
-        <tag>Cloud Deployment</tag>
-        <tag>VPS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSH公钥创建教程</title>
-    <url>/post/ssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html</url>
+    <title>使用ssh-keygen创建SSH公钥创建教程</title>
+    <url>/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
 <h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
 <h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
@@ -273,6 +218,61 @@
       <tags>
         <tag>SSH</tag>
         <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>创建DigitalOcean服务器实例Droplet</title>
+    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
+<h2 id="注册账户"><a href="#注册账户" class="headerlink" title="注册账户"></a>注册账户</h2><p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
+<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><hr>
+<h4 id="一-登录账户后-创建-new-project"><a href="#一-登录账户后-创建-new-project" class="headerlink" title="(一) 登录账户后, 创建 new project."></a>(一) 登录账户后, 创建 new project.</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
+<hr>
+<h4 id="二-填写您的项目名称，描述和用途。"><a href="#二-填写您的项目名称，描述和用途。" class="headerlink" title="(二) 填写您的项目名称，描述和用途。"></a>(二) 填写您的项目名称，描述和用途。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
+<hr>
+<h4 id="三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
+<hr>
+<h4 id="四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
+<hr>
+<h4 id="五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h4><blockquote>
+<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
+</blockquote>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
+<hr>
+<h4 id="六-自定义主机名，创建-Droplet"><a href="#六-自定义主机名，创建-Droplet" class="headerlink" title="(六) 自定义主机名，创建 Droplet"></a>(六) 自定义主机名，创建 Droplet</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
+<hr>
+<h4 id="七-创建完成后，获取-Droplet-的公网-IP"><a href="#七-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="(七) 创建完成后，获取 Droplet 的公网 IP"></a>(七) 创建完成后，获取 Droplet 的公网 IP</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
+<hr>
+<h4 id="八-检查云服务器是否激活"><a href="#八-检查云服务器是否激活" class="headerlink" title="(八) 检查云服务器是否激活"></a>(八) 检查云服务器是否激活</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
+<hr>
+<h4 id="九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。"><a href="#九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。" class="headerlink" title="(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。"></a>(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</h4><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>DigitalOcean</tag>
+        <tag>Cloud Deployment</tag>
+        <tag>VPS</tag>
       </tags>
   </entry>
   <entry>
@@ -376,8 +376,8 @@ B. 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域�
       </tags>
   </entry>
   <entry>
-    <title>HTTP的缓存Cache机制</title>
-    <url>/post/http%E7%9A%84%E7%BC%93%E5%AD%98cache%E6%9C%BA%E5%88%B6.html</url>
+    <title>HTTP缓存Cache机制</title>
+    <url>/post/http%E7%BC%93%E5%AD%98cache%E6%9C%BA%E5%88%B6.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过本文，你将会了解什么是 HTTP 缓存，以及它的好处，使用场景和具体用法。</p>
 <h2 id="什么是-HTTP-缓存？"><a href="#什么是-HTTP-缓存？" class="headerlink" title="什么是 HTTP 缓存？"></a>什么是 HTTP 缓存？</h2><p>HTTP 缓存是一种网络资源的短暂储存技术，具体来讲，就是对用户首次 HTTP 访问获取到的静态网络资源进行暂缓储存，等到二次访问时，直接给用户返回资源副本，以避免对相同的资源重复请求和渲染。</p>
 <h2 id="使用缓存的优势"><a href="#使用缓存的优势" class="headerlink" title="使用缓存的优势"></a>使用缓存的优势</h2><p>借由缓存技术，我们避免了对相同网络资源的重复请求和客户端渲染，这不仅大大减轻了服务器因为网络资源请求过载而产生的压力，降低了请求和资源应答在网络传输中的时延，而且用户体验也获得明显的提升。</p>
@@ -386,27 +386,27 @@ B. 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域�
 <h2 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h2><p>用户请求资源，如果资源已经被浏览器缓存（命中缓存），浏览器直接返回请求资源，返回 200 状态码。这一过程中不需要与服务器端进行交互。如果请求的资源已经缓存过期，浏览器才会重新和服务器发送请求。</p>
 <h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p>用户请求资源，即使命中缓存，浏览器仍然发送缓存文件的版本标识码给服务器。对于被请求的资源文件，服务器会比较浏览器持有和服务器持有的标识码，以确定用户缓存资源是否失效。<br>如果尚未失效，服务端返回 304 状态码，浏览器直接使用缓存资源。如果缓存失效，服务器会重新发送最新版本的文件资源给浏览器，以及 200 状态码。浏览器会把缓存中的旧版资源替换为会最新版本。</p>
 <h2 id="关于缓存的-Header"><a href="#关于缓存的-Header" class="headerlink" title="关于缓存的 Header"></a>关于缓存的 Header</h2><p>(1) Cache-control 定义缓存策略（ HTTP/ 1.1 ）<br>(2) ETags 和 If-None-Match 用于服务器协商缓存<br>(3) Last-Modified 和 If-Modified-Since 用于服务器协商缓存<br>(4) Pragma 和 Expires 定义缓存策略（ HTTP/ 1.0 ）</p>
-<h3 id="一-Cache-control-定义常用缓存策略"><a href="#一-Cache-control-定义常用缓存策略" class="headerlink" title="( 一 ) Cache-control 定义常用缓存策略"></a><span style="color:orange">( 一 ) Cache-control 定义常用缓存策略</span></h3><h3 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h3><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
+<h3 id="一-Cache-control-定义常用缓存策略"><a href="#一-Cache-control-定义常用缓存策略" class="headerlink" title="( 一 ) Cache-control 定义常用缓存策略"></a><span style="color:orange">( 一 ) Cache-control 定义常用缓存策略</span></h3><h4 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h4><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-store</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h3 id="协商验证的缓存"><a href="#协商验证的缓存" class="headerlink" title="协商验证的缓存"></a>协商验证的缓存</h3><p>缓存中保存文件副本，但每次使用缓存前，都需要和服务器进行缓存协商。</p>
+<h4 id="协商验证的缓存"><a href="#协商验证的缓存" class="headerlink" title="协商验证的缓存"></a>协商验证的缓存</h4><p>缓存中保存文件副本，但每次使用缓存前，都需要和服务器进行缓存协商。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-cache</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h3 id="存活时长"><a href="#存活时长" class="headerlink" title="存活时长"></a>存活时长</h3><p>指定本地缓存有效使用时长；在有效时间内，浏览器可以直接使用缓存；除非缓存过期，才需要重新向服务器发送请求。</p>
+<h4 id="存活时长"><a href="#存活时长" class="headerlink" title="存活时长"></a>存活时长</h4><p>指定本地缓存有效使用时长；在有效时间内，浏览器可以直接使用缓存；除非缓存过期，才需要重新向服务器发送请求。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : max-age=3600</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h3 id="公共缓存"><a href="#公共缓存" class="headerlink" title="公共缓存"></a>公共缓存</h3><p>允许浏览器和服务器中间的任何中间代理（如 CDN 等）对文件进行缓存。</p>
+<h4 id="公共缓存"><a href="#公共缓存" class="headerlink" title="公共缓存"></a>公共缓存</h4><p>允许浏览器和服务器中间的任何中间代理（如 CDN 等）对文件进行缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : public</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h3 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h3><p>只允许文件资源缓存在本地浏览器中，不得被其他中间代理缓存。</p>
+<h4 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h4><p>只允许文件资源缓存在本地浏览器中，不得被其他中间代理缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : private</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h3 id="缓存验证"><a href="#缓存验证" class="headerlink" title="缓存验证"></a>缓存验证</h3><p>对陈旧的缓存，需要和服务器验证状态。已过期的缓存不会被使用。</p>
+<h4 id="缓存验证"><a href="#缓存验证" class="headerlink" title="缓存验证"></a>缓存验证</h4><p>对陈旧的缓存，需要和服务器验证状态。已过期的缓存不会被使用。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : Must-revalidate</span><br></pre></td></tr></tbody></table></figure>
 
 <h3 id="二-ETags-和-If-None-Match-用于服务器协商缓存"><a href="#二-ETags-和-If-None-Match-用于服务器协商缓存" class="headerlink" title="( 二 ) ETags 和 If-None-Match 用于服务器协商缓存"></a><span style="color:orange">( 二 ) ETags 和 If-None-Match 用于服务器协商缓存</span></h3><p>(1) 浏览器首次请求资源文件。</p>
@@ -422,14 +422,14 @@ B. 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域�
 <p>(4) 当浏览器再次和服务器请求同一文件时候，客户端自动在请求头加上“Last-Modified-Since” 字段，值为 Last-Modified 时间值。</p>
 <p>例如：<code>last-modified-Since: Thu, 13 Aug 2020 22:43:16 GMT</code></p>
 <p>(5) 服务器比对修改时间。 如果 Last-Midified 时间未发生变化，服务器将返回“304 Not Modified”响应以及一个空的响应体，浏览器直接使用本地缓存文件。如果已经发生变化，服务器会返回新的文件资源，响应码为 200。</p>
-<h5 id="ETags-和-Last-Modifed-的对比："><a href="#ETags-和-Last-Modifed-的对比：" class="headerlink" title="ETags 和 Last-Modifed 的对比："></a><span style="color:orange">ETags 和 Last-Modifed 的对比：</span></h5><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
+<h3 id="四-ETags-和-Last-Modifed-的对比："><a href="#四-ETags-和-Last-Modifed-的对比：" class="headerlink" title="( 四 ) ETags 和 Last-Modifed 的对比："></a><span style="color:orange">( 四 ) ETags 和 Last-Modifed 的对比：</span></h3><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
 <p>在效率上来讲，ETags 对服务器端的开销要高于 Last-Modified，因为对于每次新的请求，服务器端都需要额外生成 ETag token 值，与浏览器缓存发来的 token 进行比较。</p>
 <p>下图为缓存策略判定：</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597837271/tech_blog/http%20cache/cache_strategy_tree.jpg"></p>
 <p>（Image Src ：reference[1] )</p>
-<h3 id="四-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#四-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="( 四 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a><span style="color:orange">( 四 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</span></h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
+<h3 id="五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a><span style="color:orange">( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</span></h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
 <h4 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h4><p>HTTP/1.0 标准中，其值为一个 GMT 时间（精确到秒）。用来定义资源在缓存中的有效时长。但由于返回的是服务器端的时间，如果客户端时区不一致，可能会导致缓存策略失败。缓存在有效日期前会直接返回用户；资源过期后需要重新向服务器端请求资源。如果 Pragma 和 Expires 同时存在，Pragma 优先级最高。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h2><p><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
 <p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ</a> [2]</p>
 <script>
         document.querySelectorAll('.github-emoji')
