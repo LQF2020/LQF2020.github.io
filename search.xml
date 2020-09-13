@@ -276,6 +276,229 @@
       </tags>
   </entry>
   <entry>
+    <title>DevOps篇 - 关于Docker入门教程</title>
+    <url>/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述 Docker 的基本概念以及仓库，镜像，容器的使用。</p>
+<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="( 一 ) 什么是 Docker？"></a>( 一 ) 什么是 Docker？</h2><hr>
+<p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。</p>
+<p>开发者通过 Docker 打包他们的应用以及与应用相关的依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，开发者通过 Docker 提供的命令对应用容器进行创建，运行，管理，以及销毁。</p>
+<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="( 二 ) 为什么需要 Docker？"></a>( 二 ) 为什么需要 Docker？</h2><hr>
+<p>使用 Docker 的最大好处就是，根本上解决了软件应用由于运行在不同机器而产生一系列环境冲突的问题。</p>
+<p>举个例子，我们在自己的电脑上编写基于 Python3.7 语法的脚本，可以被本机上 python3 的解释器所识别以及运行。但是，却没办法保证这一脚本可以在别的平台的机器上运行。这正是因为程序员开发的脚本，应用, 程序无一不依赖着机器本身所处的环境。</p>
+<p>而 Docker 作为应用容器，允许程序员把应用的源代码，以及相关依赖包，一系列环境参数，统一封装和打包到容器之中；并且由于容器的可移植性，应用就可以运行在不同的平台之上。</p>
+<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="( 三 ) Docker 和虚拟机"></a>( 三 ) Docker 和虚拟机</h2><hr>
+<p>(1) Docker 有着比虚拟机更少的抽象层。由于 docker 不需要 Hypervisor 实现硬件资源虚拟化，运行在 docker 容器上的程序直接使用的都是实际物理机的硬件资源。因此在 CPU、内存利用率上 docker 将会在效率上有优势。</p>
+<p>(2) Docker 利用的是宿主机的内核，而不需要 Guest OS。因此，当新建一个容器时，docker 不需要和虚拟机一样重新加载一个操作系统内核。</p>
+<p>(3) Docker 容器的启动是秒级的；而虚拟机启动是分钟级的。</p>
+<p>(4) 一般而言，一台电脑借由虚拟机可以最多同时运行 2，3 个不同的操作系统；却可以同时运行上千个 Docker 容器。</p>
+<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="( 四 ) 安装 Docker"></a>( 四 ) 安装 Docker</h2><hr>
+<p>1.请进入 <a href="https://hub.docker.com/">Docker 官网</a>, 注册您的 DockerHub 账户。</p>
+<p>2.下载，安装，配置 Docker Desktop。</p>
+<ul>
+<li><a href="https://docs.docker.com/docker-for-windows/install/">window 官网教程</a></li>
+<li><a href="https://docs.docker.com/docker-for-mac/install/">mac 官网教程</a></li>
+</ul>
+<p>检查 Docker 是否安装并配置到本地环境:</p>
+<pre><code>&gt; docker -v
+
+Docker version 19.03.12, build 48a662</code></pre>
+<p>运行 Docker Desktop, 检查 Docker 服务是否开启:<br>如果 Docker 服务已开启，该命令将列出所有本地 images。</p>
+<pre><code>&gt; docker images
+REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
+#         #      #         #      #</code></pre>
+<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="( 五 ) Docker 基本知识"></a>( 五 ) Docker 基本知识</h2><hr>
+<ul>
+<li><p>仓库 Repository<br>为开发者提供一系列打包好的官网应用镜像，第三方应用镜像源</p>
+</li>
+<li><p>镜像 Image<br>创建应用容器 Container 的模板文件，利用它可以生成一个运行时的应用容器</p>
+</li>
+<li><p>容器 Container<br>基于镜像 Image 模板生成的，包含了应用的源代码，相关依赖包，以及应用运行所需环境的容器</p>
+</li>
+<li><p>DockerFile<br>用于生成 Docker 镜像 Images 的指令文件</p>
+</li>
+</ul>
+<p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
+<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="( 六 ) Docker 仓库 Dockerhub"></a>( 六 ) Docker 仓库 Dockerhub</h2><hr>
+<p>正如上文提及，Docker 容器都是基于镜像 Image 创建的。那么如何获取镜像呢？</p>
+<p>比如，官方镜像仓库 <a href="https://hub.docker.com/">DockerHub</a> 为我们提供了大量优质的官方镜像。</p>
+<p>打开命令行终端，</p>
+<p>1.登录 DockerHub</p>
+<pre><code>&gt; docker login</code></pre>
+<p>2.通过 <code>pull</code> 命令从 DockerHub 中抓取官方镜像文件，以 ubuntu 为例。</p>
+<pre><code>&gt; docker pull ubuntu:latest
+
+# ubuntu 为镜像仓库名 latest 为版本号，即最新版本</code></pre>
+<p>3.通过 <code>images</code> 命令查询本地镜像，ubuntu 镜像拉取成功</p>
+<pre><code>&gt; docker images
+
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
+<p>4.登出 DockerHub</p>
+<pre><code>&gt; docker logout</code></pre>
+<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="( 七 ) Docker 镜像指令"></a>( 七 ) Docker 镜像指令</h2><hr>
+<p>1.从仓库获取镜像</p>
+<pre><code>&gt; docker pull &lt;镜像仓库名&gt;:&lt;版本号&gt;</code></pre>
+<p>2.查询本地所有存在镜像</p>
+<pre><code>&gt; docker images</code></pre>
+<p>3.删除镜像</p>
+<pre><code>&gt; docker rmi &lt;镜像ID&gt;</code></pre>
+<p>4.查询仓库指定镜像</p>
+<pre><code>&gt; docker search &lt;镜像关键字&gt;</code></pre>
+<p>5.推送镜像到 Dockerhub</p>
+<p>很多情况下，我们会通过修改镜像来满足实际开发需要，比如镜像内的环境参数，文件结构，依赖等。登录 DockerHub，把修改后的镜像推送到远程仓库，则可以实现镜像保存共享的目的。</p>
+<pre><code># 首先，使用 `tag` 命令为被推送的镜像打上标签，username 务必与您的 Docker 账号用户名一致。
+&gt; docker tag &lt;镜像ID&gt; &lt;username&gt;/&lt;自定义镜像名&gt;:&lt;版本号&gt;
+
+# 使用 `push` 命令推送到自己的DockerHub仓库上。
+&gt; docker push username/&lt;自定义镜像名&gt;:&lt;版本号&gt;</code></pre>
+<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="( 八 ) Docker 容器 Container"></a>( 八 ) Docker 容器 Container</h2><hr>
+<p>容器各种状态：</p>
+<p>created（已创建）<br>restarting（重启中）<br>running（运行中）<br>removing（迁移中）<br>paused（暂停）<br>exited（停止）<br>dead（死亡）</p>
+<p>1.基于镜像，创建并运行容器</p>
+<h3 id="以-ubuntu-为例，本地开启交互伪终端"><a href="#以-ubuntu-为例，本地开启交互伪终端" class="headerlink" title="以 ubuntu 为例，本地开启交互伪终端"></a>以 ubuntu 为例，本地开启交互伪终端</h3><pre><code>&gt; docker run -t -i --name &lt;自定义容器名称&gt; ubuntu:latest /bin/bash
+&gt; root@1c7ead338ea0:/#
+
+# ubuntu:latest 指定镜像, ubuntu 为镜像仓库名，latest 为版本
+# --name 自定义容器名称
+# -t 当前窗口创建伪终端
+# -i 允许用户标准输入交互
+# bin/bash 放在镜像名后的是命令，这里我们希望有个交互式 Shell，因此用的是 /bin/bash。</code></pre>
+<p>至此， 已经成功创建 ubuntu 应用容器，并打开了终端窗口 <code>root@1c7ead338ea0:/#</code> 。</p>
+<h3 id="以-mysql-为例-p-指定端口映射"><a href="#以-mysql-为例-p-指定端口映射" class="headerlink" title="以 mysql 为例, -p 指定端口映射"></a>以 mysql 为例, <code>-p</code> 指定端口映射</h3><pre><code>&gt; docker run -itd --name mysql-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+
+# -p 3306:3306 ：映射容器服务的 3306 端口到宿主机的 3306 端口
+# 外部主机可以直接通过 宿主机ip:3306 访问到 MySQL 的服务。
+
+# -e MYSQL_ROOT_PASSWORD=123456
+# 设置 MySQL 服务 root 用户的密码。</code></pre>
+<p>2.查询运行中的容器</p>
+<pre><code>&gt; docker ps</code></pre>
+<p>3.查询所有状态的容器</p>
+<pre><code>&gt; docker ps -a</code></pre>
+<p>4.查询所有状态的容器</p>
+<pre><code>&gt; docker ps -a</code></pre>
+<p>5.启动一个已停止的容器</p>
+<pre><code>&gt; docker start &lt;容器ID&gt;</code></pre>
+<p>6.停止容器</p>
+<pre><code>&gt; docker stop &lt;容器ID&gt;</code></pre>
+<p>7.重启容器</p>
+<pre><code>&gt; docker restart &lt;容器ID&gt;</code></pre>
+<p>8.容器后台运行，<code>-d</code> 指定容器运行模式为后台服务</p>
+<pre><code>&gt; docker run -i -t -d &lt;镜像 ID&gt; /bin/bash</code></pre>
+<p>9.进入容器内部，两种方式</p>
+<pre><code>&gt; docker attach &lt;容器 ID&gt;
+或
+&gt; docker exec -it &lt;容器 ID&gt; /bin/bash
+
+# 区别：
+# exec：Run a command in a running container
+是针对已运行的容器实例进行操作，在已运行的容器中执行命令，不创建和启动新的容器，退出 shell 不会导致容器停止运行。
+
+# attach：Attach local standard input, output, and error streams to a running container
+# 本机的输入直接输到容器中，容器的输出会直接显示在本机的屏幕上，如果退出容器的 shell，容器会停止运行。</code></pre>
+<p>10.主机与容器文件拷贝</p>
+<p>从主机到容器</p>
+<pre><code>&gt; docker cp &lt;主机文件&gt; &lt;容器 ID&gt;:&lt;拷贝路径&gt;
+
+# 将主机当前文件夹下的a.txt 拷贝到容器96f7f14239ff的 /www 目录下。
+# docker cp ./a.txt 96f7f14239ff:/www/</code></pre>
+<p>从容器到主机</p>
+<pre><code>&gt; docker cp &lt;容器 ID&gt;:&lt;拷贝文件&gt; &lt;主机路径&gt;
+
+# 将容器96f7f14239ff的 /www 目录拷贝到主机 /tmp/下。
+# docker cp 96f7f14239ff:/www/ /tmp/</code></pre>
+<p>11.删除容器</p>
+<pre><code>&gt; docker rm &lt;容器 ID&gt;</code></pre>
+<p>12.导出容器</p>
+<pre><code>&gt; docker export &lt;容器ID&gt; &gt; &lt;导出的文件名.tar&gt;</code></pre>
+<p>13.重新导入容器</p>
+<pre><code>&gt; docker import &lt;导出的文件名.tar&gt; &lt;自定义镜像名称&gt;：&lt;版本&gt;
+
+# 另外 docker load 命令也可以导入一个镜像存储文件
+# import：丢弃了所有的历史记录和元数据信息，仅保存容器当时的快照状态。在导入的时候可以重新制定标签等元数据信息。
+# load：将保存完整记录，体积较大。</code></pre>
+<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="( 九 ) 容器数据持久化及共享"></a>( 九 ) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
+<p>Docker 提供了 3 种持久化数据的方式：</p>
+<p>volumes：存于主机文件系统中 Docker 管理的目录下，解决了跨平台间资料权限和路径引用问题。<br>bind mount：存于主机文件系统中的任意位置。可能由于不同平台间权限和路径引用不同而发生冲突。<br>tmpfs mount（Linux 中）：存于内存中（注意，并不是持久化到磁盘）。在容器的生命周期中，它能被容器用来存放非持久化的状态或敏感信息。</p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg"></p>
+<h3 id="Docker-官方推荐使用-volume-实现数据持久化。"><a href="#Docker-官方推荐使用-volume-实现数据持久化。" class="headerlink" title="Docker 官方推荐使用 volume 实现数据持久化。"></a>Docker 官方推荐使用 volume 实现数据持久化。</h3><p>1.创建 volume,名为 my-vol</p>
+<pre><code>&gt; docker volume create my-vol</code></pre>
+<p>2.列出 volume</p>
+<pre><code>&gt; docker volume ls
+local     my-vol</code></pre>
+<p>3.获取 volume 信息</p>
+<pre><code>&gt; docker volume inspect my-vol
+[
+    {
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]</code></pre>
+<p>4.移除 volume</p>
+<pre><code>&gt; docker volume rm my-vol</code></pre>
+<p>5.使用 <code>-v</code> 命令为 nginx 容器绑定 volume</p>
+<pre><code># 将本机下创建的`my-vol`绑定到nginx容器的`/app/`文件夹下
+&gt; docker run -d --name my-app -v my-vol:/app nginx:latest</code></pre>
+<p>至此，在容器的/app/文件夹下一切文件的添加，删除，修改都会同步到 my-vol 之中，反之亦然。</p>
+<p>6.使用 <code>docker inspect my-app</code> 查看 volume 挂在路径</p>
+<pre><code>"Mounts": [
+
+    {
+        "Type": "volume",
+        "Name": "my-vol",
+        "Source": "/var/lib/docker/volumes/my-vol/_data",
+        "Destination": "/app",
+        "Driver": "local",
+        "Mode": "",
+        "RW": true,
+        "Propagation": ""
+    }
+
+]</code></pre>
+<p>6.停止容器，移除 volume</p>
+<pre><code>&gt; docker stop my-app
+
+&gt; docker rm my-app
+
+&gt; docker volume rm my-vol</code></pre>
+<h3 id="使用数据卷容器"><a href="#使用数据卷容器" class="headerlink" title="使用数据卷容器"></a>使用数据卷容器</h3><p>数据卷容器,顾名思义本身就是个 Docker 容器，只是充当了储存并共享容器数据的角色。<br>我们使用 <code>--volumes-from</code> 命令，将某个容器 volume 的挂载到另一个容器上。</p>
+<p>假如当前有 my-app1 容器，已经与本机实现了 volume 挂载。<br>执行下列命令，将创建 my-app2 容器，并且将 volume 来源 直接挂载到 my-app1 容器</p>
+<pre><code>&gt; docker run --volumes-from &lt;my-app1 容器ID&gt; --name my-app2 -i -t ubuntu /bin/bash</code></pre>
+<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><hr>
+<p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程，我们将会讲述如何使用 dockerfile 创建 image。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>DevOps</category>
+      </categories>
+      <tags>
+        <tag>DevOps</tag>
+        <tag>CI/CD</tag>
+        <tag>Deployment</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>网页开发之跨域请求CORS的实现-下篇</title>
     <url>/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过本教程，您将会了解如何解决网页开发中的跨域请求（CORS）中的冲突。<br>如果您不清楚什么是跨域请求和跨域冲突，建议请先阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  
+  <link rel="stylesheet" href="/lib/animate-css/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.luqifu.tech","root":"/","scheme":"Muse","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="本文主要讲述Docker的基本概念以及仓库，镜像，容器的使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DevOps篇 - 关于Docker入门教程">
+<meta property="og:url" content="https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html">
+<meta property="og:site_name" content="富仔的技术博">
+<meta property="og:description" content="本文主要讲述Docker的基本概念以及仓库，镜像，容器的使用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg">
+<meta property="article:published_time" content="2020-09-12T08:02:38.000Z">
+<meta property="article:modified_time" content="2020-09-13T03:08:54.093Z">
+<meta property="article:author" content="Qifu Lu">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="Deployment">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg">
+
+<link rel="canonical" href="https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>DevOps篇 - 关于Docker入门教程 | 富仔的技术博</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="富仔的技术博" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">富仔的技术博</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享开发心得，记录学习点滴</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E4%BB%80%E4%B9%88%E6%98%AF-Docker%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">( 一 ) 什么是 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-Docker%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">( 二 ) 为什么需要 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-Docker-%E5%92%8C%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-number">4.</span> <span class="nav-text">( 三 ) Docker 和虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E5%AE%89%E8%A3%85-Docker"><span class="nav-number">5.</span> <span class="nav-text">( 四 ) 安装 Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94-Docker-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="nav-number">6.</span> <span class="nav-text">( 五 ) Docker 基本知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD-Docker-%E4%BB%93%E5%BA%93-Dockerhub"><span class="nav-number">7.</span> <span class="nav-text">( 六 ) Docker 仓库 Dockerhub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83-Docker-%E9%95%9C%E5%83%8F%E6%8C%87%E4%BB%A4"><span class="nav-number">8.</span> <span class="nav-text">( 七 ) Docker 镜像指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB-Docker-%E5%AE%B9%E5%99%A8-Container"><span class="nav-number">9.</span> <span class="nav-text">( 八 ) Docker 容器 Container</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-ubuntu-%E4%B8%BA%E4%BE%8B%EF%BC%8C%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%90%AF%E4%BA%A4%E4%BA%92%E4%BC%AA%E7%BB%88%E7%AB%AF"><span class="nav-number">9.1.</span> <span class="nav-text">以 ubuntu 为例，本地开启交互伪终端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-mysql-%E4%B8%BA%E4%BE%8B-p-%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84"><span class="nav-number">9.2.</span> <span class="nav-text">以 mysql 为例, -p 指定端口映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D-%E5%AE%B9%E5%99%A8%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E5%8F%8A%E5%85%B1%E4%BA%AB"><span class="nav-number">10.</span> <span class="nav-text">( 九 ) 容器数据持久化及共享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8-volume-%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%82"><span class="nav-number">10.1.</span> <span class="nav-text">Docker 官方推荐使用 volume 实现数据持久化。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8"><span class="nav-number">10.2.</span> <span class="nav-text">使用数据卷容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%B0%86%E4%BC%9A%E6%8C%81%E7%BB%AD%E5%88%B0%E6%B2%A1%E6%9C%89%E4%BB%BB%E4%B8%80%E5%AE%B9%E5%99%A8%E5%BA%94%E7%94%A8%E4%B8%BA%E6%AD%A2%E3%80%82%E8%8B%A5%E5%8F%A6%E4%B8%80%E5%AE%B9%E5%99%A8-my-app3-%E5%B0%86-voluem-%E6%8C%82%E8%BD%BD%E5%88%B0-my-app2%EF%BC%8C%E5%8D%B3%E4%BD%BF%E6%88%91%E4%BB%AC%E6%8A%8A-my-app1-%E5%AE%B9%E5%99%A8%E7%A7%BB%E9%99%A4%EF%BC%8C%E4%B9%9F%E4%B8%8D%E5%BD%B1%E5%93%8D-my-app3-%E5%92%8C-my-app2-%E7%9A%84%E6%8C%82%E8%BD%BD%E5%85%B3%E7%B3%BB%E3%80%82"><span class="nav-number">10.2.1.</span> <span class="nav-text">注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">11.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Qifu Lu"
+      src="https://luqifu.com/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Qifu Lu</p>
+  <div class="site-description" itemprop="description">全栈开发的小日常</div>
+</div>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：12.1k</span>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/LQF2020" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;LQF2020" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/qifu.lu.1" title="FB → https:&#x2F;&#x2F;www.facebook.com&#x2F;qifu.lu.1" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      个人项目
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://luqifu.com/" title="https:&#x2F;&#x2F;luqifu.com" rel="noopener" target="_blank">Portfolio</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://qifublog.com/" title="https:&#x2F;&#x2F;qifublog.com" rel="noopener" target="_blank">Life Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://triplacer.com/" title="https:&#x2F;&#x2F;triplacer.com" rel="noopener" target="_blank">Triplacer</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://financepacker.com/" title="https:&#x2F;&#x2F;financepacker.com" rel="noopener" target="_blank">Financepacker</a>
+        </li>
+    </ul>
+  </div>
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/LQF2020" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://luqifu.com/img/avatar.jpg">
+      <meta itemprop="name" content="Qifu Lu">
+      <meta itemprop="description" content="全栈开发的小日常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="富仔的技术博">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DevOps篇 - 关于Docker入门教程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-12 18:02:38" itemprop="dateCreated datePublished" datetime="2020-09-12T18:02:38+10:00">2020-09-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-13 13:08:54" itemprop="dateModified" datetime="2020-09-13T13:08:54+10:00">2020-09-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DevOps/" itemprop="url" rel="index"><span itemprop="name">DevOps</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>12 mins</span>
+            </span>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述 Docker 的基本概念以及仓库，镜像，容器的使用。</p>
+<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="( 一 ) 什么是 Docker？"></a>( 一 ) 什么是 Docker？</h2><hr>
+<p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。</p>
+<p>开发者通过 Docker 打包他们的应用以及与应用相关的依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，开发者通过 Docker 提供的命令对应用容器进行创建，运行，管理，以及销毁。</p>
+<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="( 二 ) 为什么需要 Docker？"></a>( 二 ) 为什么需要 Docker？</h2><hr>
+<p>使用 Docker 的最大好处就是，根本上解决了软件应用由于运行在不同机器而产生一系列环境冲突的问题。</p>
+<p>举个例子，我们在自己的电脑上编写基于 Python3.7 语法的脚本，可以被本机上 python3 的解释器所识别以及运行。但是，却没办法保证这一脚本可以在别的平台的机器上运行。这正是因为程序员开发的脚本，应用, 程序无一不依赖着机器本身所处的环境。</p>
+<p>而 Docker 作为应用容器，允许程序员把应用的源代码，以及相关依赖包，一系列环境参数，统一封装和打包到容器之中；并且由于容器的可移植性，应用就可以运行在不同的平台之上。</p>
+<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="( 三 ) Docker 和虚拟机"></a>( 三 ) Docker 和虚拟机</h2><hr>
+<p>(1) Docker 有着比虚拟机更少的抽象层。由于 docker 不需要 Hypervisor 实现硬件资源虚拟化，运行在 docker 容器上的程序直接使用的都是实际物理机的硬件资源。因此在 CPU、内存利用率上 docker 将会在效率上有优势。</p>
+<p>(2) Docker 利用的是宿主机的内核，而不需要 Guest OS。因此，当新建一个容器时，docker 不需要和虚拟机一样重新加载一个操作系统内核。</p>
+<p>(3) Docker 容器的启动是秒级的；而虚拟机启动是分钟级的。</p>
+<p>(4) 一般而言，一台电脑借由虚拟机可以最多同时运行 2，3 个不同的操作系统；却可以同时运行上千个 Docker 容器。</p>
+<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="( 四 ) 安装 Docker"></a>( 四 ) 安装 Docker</h2><hr>
+<p>1.请进入 <a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker 官网</a>, 注册您的 DockerHub 账户。</p>
+<p>2.下载，安装，配置 Docker Desktop。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.docker.com/docker-for-windows/install/">window 官网教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.docker.com/docker-for-mac/install/">mac 官网教程</a></li>
+</ul>
+<p>检查 Docker 是否安装并配置到本地环境:</p>
+<pre><code>&gt; docker -v
+
+Docker version 19.03.12, build 48a662</code></pre>
+<p>运行 Docker Desktop, 检查 Docker 服务是否开启:<br>如果 Docker 服务已开启，该命令将列出所有本地 images。</p>
+<pre><code>&gt; docker images
+REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
+#         #      #         #      #</code></pre>
+<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="( 五 ) Docker 基本知识"></a>( 五 ) Docker 基本知识</h2><hr>
+<ul>
+<li><p>仓库 Repository<br>为开发者提供一系列打包好的官网应用镜像，第三方应用镜像源</p>
+</li>
+<li><p>镜像 Image<br>创建应用容器 Container 的模板文件，利用它可以生成一个运行时的应用容器</p>
+</li>
+<li><p>容器 Container<br>基于镜像 Image 模板生成的，包含了应用的源代码，相关依赖包，以及应用运行所需环境的容器</p>
+</li>
+<li><p>DockerFile<br>用于生成 Docker 镜像 Images 的指令文件</p>
+</li>
+</ul>
+<p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
+<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="( 六 ) Docker 仓库 Dockerhub"></a>( 六 ) Docker 仓库 Dockerhub</h2><hr>
+<p>正如上文提及，Docker 容器都是基于镜像 Image 创建的。那么如何获取镜像呢？</p>
+<p>比如，官方镜像仓库 <a target="_blank" rel="noopener" href="https://hub.docker.com/">DockerHub</a> 为我们提供了大量优质的官方镜像。</p>
+<p>打开命令行终端，</p>
+<p>1.登录 DockerHub</p>
+<pre><code>&gt; docker login</code></pre>
+<p>2.通过 <code>pull</code> 命令从 DockerHub 中抓取官方镜像文件，以 ubuntu 为例。</p>
+<pre><code>&gt; docker pull ubuntu:latest
+
+# ubuntu 为镜像仓库名 latest 为版本号，即最新版本</code></pre>
+<p>3.通过 <code>images</code> 命令查询本地镜像，ubuntu 镜像拉取成功</p>
+<pre><code>&gt; docker images
+
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
+<p>4.登出 DockerHub</p>
+<pre><code>&gt; docker logout</code></pre>
+<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="( 七 ) Docker 镜像指令"></a>( 七 ) Docker 镜像指令</h2><hr>
+<p>1.从仓库获取镜像</p>
+<pre><code>&gt; docker pull &lt;镜像仓库名&gt;:&lt;版本号&gt;</code></pre>
+<p>2.查询本地所有存在镜像</p>
+<pre><code>&gt; docker images</code></pre>
+<p>3.删除镜像</p>
+<pre><code>&gt; docker rmi &lt;镜像ID&gt;</code></pre>
+<p>4.查询仓库指定镜像</p>
+<pre><code>&gt; docker search &lt;镜像关键字&gt;</code></pre>
+<p>5.推送镜像到 Dockerhub</p>
+<p>很多情况下，我们会通过修改镜像来满足实际开发需要，比如镜像内的环境参数，文件结构，依赖等。登录 DockerHub，把修改后的镜像推送到远程仓库，则可以实现镜像保存共享的目的。</p>
+<pre><code># 首先，使用 `tag` 命令为被推送的镜像打上标签，username 务必与您的 Docker 账号用户名一致。
+&gt; docker tag &lt;镜像ID&gt; &lt;username&gt;/&lt;自定义镜像名&gt;:&lt;版本号&gt;
+
+# 使用 `push` 命令推送到自己的DockerHub仓库上。
+&gt; docker push username/&lt;自定义镜像名&gt;:&lt;版本号&gt;</code></pre>
+<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="( 八 ) Docker 容器 Container"></a>( 八 ) Docker 容器 Container</h2><hr>
+<p>容器各种状态：</p>
+<p>created（已创建）<br>restarting（重启中）<br>running（运行中）<br>removing（迁移中）<br>paused（暂停）<br>exited（停止）<br>dead（死亡）</p>
+<p>1.基于镜像，创建并运行容器</p>
+<h3 id="以-ubuntu-为例，本地开启交互伪终端"><a href="#以-ubuntu-为例，本地开启交互伪终端" class="headerlink" title="以 ubuntu 为例，本地开启交互伪终端"></a>以 ubuntu 为例，本地开启交互伪终端</h3><pre><code>&gt; docker run -t -i --name &lt;自定义容器名称&gt; ubuntu:latest /bin/bash
+&gt; root@1c7ead338ea0:/#
+
+# ubuntu:latest 指定镜像, ubuntu 为镜像仓库名，latest 为版本
+# --name 自定义容器名称
+# -t 当前窗口创建伪终端
+# -i 允许用户标准输入交互
+# bin/bash 放在镜像名后的是命令，这里我们希望有个交互式 Shell，因此用的是 /bin/bash。</code></pre>
+<p>至此， 已经成功创建 ubuntu 应用容器，并打开了终端窗口 <code>root@1c7ead338ea0:/#</code> 。</p>
+<h3 id="以-mysql-为例-p-指定端口映射"><a href="#以-mysql-为例-p-指定端口映射" class="headerlink" title="以 mysql 为例, -p 指定端口映射"></a>以 mysql 为例, <code>-p</code> 指定端口映射</h3><pre><code>&gt; docker run -itd --name mysql-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+
+# -p 3306:3306 ：映射容器服务的 3306 端口到宿主机的 3306 端口
+# 外部主机可以直接通过 宿主机ip:3306 访问到 MySQL 的服务。
+
+# -e MYSQL_ROOT_PASSWORD=123456
+# 设置 MySQL 服务 root 用户的密码。</code></pre>
+<p>2.查询运行中的容器</p>
+<pre><code>&gt; docker ps</code></pre>
+<p>3.查询所有状态的容器</p>
+<pre><code>&gt; docker ps -a</code></pre>
+<p>4.查询所有状态的容器</p>
+<pre><code>&gt; docker ps -a</code></pre>
+<p>5.启动一个已停止的容器</p>
+<pre><code>&gt; docker start &lt;容器ID&gt;</code></pre>
+<p>6.停止容器</p>
+<pre><code>&gt; docker stop &lt;容器ID&gt;</code></pre>
+<p>7.重启容器</p>
+<pre><code>&gt; docker restart &lt;容器ID&gt;</code></pre>
+<p>8.容器后台运行，<code>-d</code> 指定容器运行模式为后台服务</p>
+<pre><code>&gt; docker run -i -t -d &lt;镜像 ID&gt; /bin/bash</code></pre>
+<p>9.进入容器内部，两种方式</p>
+<pre><code>&gt; docker attach &lt;容器 ID&gt;
+或
+&gt; docker exec -it &lt;容器 ID&gt; /bin/bash
+
+# 区别：
+# exec：Run a command in a running container
+是针对已运行的容器实例进行操作，在已运行的容器中执行命令，不创建和启动新的容器，退出 shell 不会导致容器停止运行。
+
+# attach：Attach local standard input, output, and error streams to a running container
+# 本机的输入直接输到容器中，容器的输出会直接显示在本机的屏幕上，如果退出容器的 shell，容器会停止运行。</code></pre>
+<p>10.主机与容器文件拷贝</p>
+<p>从主机到容器</p>
+<pre><code>&gt; docker cp &lt;主机文件&gt; &lt;容器 ID&gt;:&lt;拷贝路径&gt;
+
+# 将主机当前文件夹下的a.txt 拷贝到容器96f7f14239ff的 /www 目录下。
+# docker cp ./a.txt 96f7f14239ff:/www/</code></pre>
+<p>从容器到主机</p>
+<pre><code>&gt; docker cp &lt;容器 ID&gt;:&lt;拷贝文件&gt; &lt;主机路径&gt;
+
+# 将容器96f7f14239ff的 /www 目录拷贝到主机 /tmp/下。
+# docker cp 96f7f14239ff:/www/ /tmp/</code></pre>
+<p>11.删除容器</p>
+<pre><code>&gt; docker rm &lt;容器 ID&gt;</code></pre>
+<p>12.导出容器</p>
+<pre><code>&gt; docker export &lt;容器ID&gt; &gt; &lt;导出的文件名.tar&gt;</code></pre>
+<p>13.重新导入容器</p>
+<pre><code>&gt; docker import &lt;导出的文件名.tar&gt; &lt;自定义镜像名称&gt;：&lt;版本&gt;
+
+# 另外 docker load 命令也可以导入一个镜像存储文件
+# import：丢弃了所有的历史记录和元数据信息，仅保存容器当时的快照状态。在导入的时候可以重新制定标签等元数据信息。
+# load：将保存完整记录，体积较大。</code></pre>
+<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="( 九 ) 容器数据持久化及共享"></a>( 九 ) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
+<p>Docker 提供了 3 种持久化数据的方式：</p>
+<p>volumes：存于主机文件系统中 Docker 管理的目录下，解决了跨平台间资料权限和路径引用问题。<br>bind mount：存于主机文件系统中的任意位置。可能由于不同平台间权限和路径引用不同而发生冲突。<br>tmpfs mount（Linux 中）：存于内存中（注意，并不是持久化到磁盘）。在容器的生命周期中，它能被容器用来存放非持久化的状态或敏感信息。</p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg"></p>
+<h3 id="Docker-官方推荐使用-volume-实现数据持久化。"><a href="#Docker-官方推荐使用-volume-实现数据持久化。" class="headerlink" title="Docker 官方推荐使用 volume 实现数据持久化。"></a>Docker 官方推荐使用 volume 实现数据持久化。</h3><p>1.创建 volume,名为 my-vol</p>
+<pre><code>&gt; docker volume create my-vol</code></pre>
+<p>2.列出 volume</p>
+<pre><code>&gt; docker volume ls
+local     my-vol</code></pre>
+<p>3.获取 volume 信息</p>
+<pre><code>&gt; docker volume inspect my-vol
+[
+    {
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]</code></pre>
+<p>4.移除 volume</p>
+<pre><code>&gt; docker volume rm my-vol</code></pre>
+<p>5.使用 <code>-v</code> 命令为 nginx 容器绑定 volume</p>
+<pre><code># 将本机下创建的`my-vol`绑定到nginx容器的`/app/`文件夹下
+&gt; docker run -d --name my-app -v my-vol:/app nginx:latest</code></pre>
+<p>至此，在容器的/app/文件夹下一切文件的添加，删除，修改都会同步到 my-vol 之中，反之亦然。</p>
+<p>6.使用 <code>docker inspect my-app</code> 查看 volume 挂在路径</p>
+<pre><code>"Mounts": [
+
+    {
+        "Type": "volume",
+        "Name": "my-vol",
+        "Source": "/var/lib/docker/volumes/my-vol/_data",
+        "Destination": "/app",
+        "Driver": "local",
+        "Mode": "",
+        "RW": true,
+        "Propagation": ""
+    }
+
+]</code></pre>
+<p>6.停止容器，移除 volume</p>
+<pre><code>&gt; docker stop my-app
+
+&gt; docker rm my-app
+
+&gt; docker volume rm my-vol</code></pre>
+<h3 id="使用数据卷容器"><a href="#使用数据卷容器" class="headerlink" title="使用数据卷容器"></a>使用数据卷容器</h3><p>数据卷容器,顾名思义本身就是个 Docker 容器，只是充当了储存并共享容器数据的角色。<br>我们使用 <code>--volumes-from</code> 命令，将某个容器 volume 的挂载到另一个容器上。</p>
+<p>假如当前有 my-app1 容器，已经与本机实现了 volume 挂载。<br>执行下列命令，将创建 my-app2 容器，并且将 volume 来源 直接挂载到 my-app1 容器</p>
+<pre><code>&gt; docker run --volumes-from &lt;my-app1 容器ID&gt; --name my-app2 -i -t ubuntu /bin/bash</code></pre>
+<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><hr>
+<p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程，我们将会讲述如何使用 dockerfile 创建 image。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+        
+
+<div style="margin-top:50px">
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Qifu Lu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html" title="DevOps篇 - 关于Docker入门教程">https://www.luqifu.tech/post/devops篇-关于docker入门教程.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DevOps/" rel="tag"><i class="fa fa-tag"></i> DevOps</a>
+              <a href="/tags/CI-CD/" rel="tag"><i class="fa fa-tag"></i> CI/CD</a>
+              <a href="/tags/Deployment/" rel="tag"><i class="fa fa-tag"></i> Deployment</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/http%E7%BC%93%E5%AD%98cache%E6%9C%BA%E5%88%B6.html" rel="prev" title="HTTP缓存Cache机制">
+      <i class="fa fa-chevron-left"></i> HTTP缓存Cache机制
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qifu Lu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：12.1k</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
