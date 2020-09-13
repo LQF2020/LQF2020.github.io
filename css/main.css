@@ -1941,8 +1941,14 @@ pre code {
 }
 hr {
   height: 0;
-  border: 1px solid #202125;
+  border: 1px solid #a9c9d8;
   margin: 10px;
+}
+h2 {
+  color: #eac47f;
+}
+h3 {
+  color: #91ce7d;
 }
 .post-block {
   padding: 20px 20px 20px 20px;
@@ -3021,7 +3027,7 @@ mark.search-keyword {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #8e7e3c;
+  background: #90d7f1;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);

@@ -4,32 +4,33 @@
     <title>DigitalOcean, Node.js, Nginx, PM2整合部署方案</title>
     <url>/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过阅读本教程，你将会学习如何将 Node.js 应用部署到云端服务器 DigitalOcean 中，并整合 SSH 登录， Nginx 作为反向代理，PM2 进程管理器， 防火墙端口配置的相关知识。</p>
-<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><p>(1) 购买自定义域名。尚未拥有域名，可前往 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 或者 其他域名提供商注册。<br>(2) 创建 SSH 连接的公私钥。尚未拥有公钥，前往 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。<br>(3) 创建一台云服务器（VPS）。本教程使用 DigitalOcean 创建。尚未拥有 VPS, 前往 <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html" title="DigitalOcean服务器创建">DigitalOcean服务器创建</a> 教程。</p>
-<h2 id="教程用例"><a href="#教程用例" class="headerlink" title="教程用例"></a>教程用例</h2><p>网站域名<br>demo.luqifu.tech<br>云服务器<br>161.35.59.204 - Ubuntu18.04.3</p>
-<h2 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h2><p>(1) SSH 远程登录 DigitalOcean 云服务器<br>(2) 创建一个 Node.js 应用<br>(3) 安装并使用 Node 应用管理器 PM2<br>(4) DNS 域名和服务器 IP 绑定<br>(5) Nginx 下载，进行反向代理配置</p>
-<hr>
-<h4 id="（1）SSH-远程登录-DigitalOcean-云服务器"><a href="#（1）SSH-远程登录-DigitalOcean-云服务器" class="headerlink" title="（1）SSH 远程登录 DigitalOcean 云服务器"></a>（1）SSH 远程登录 DigitalOcean 云服务器</h4><p>本地控制台输入</p>
+<h2 id="一-前期准备"><a href="#一-前期准备" class="headerlink" title="(一) 前期准备"></a>(一) 前期准备</h2><hr>
+<p>(1) 购买自定义域名。尚未拥有域名，可前往 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 或者 其他域名提供商注册。<br>(2) 创建 SSH 连接的公私钥。尚未拥有公钥，前往 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。<br>(3) 创建一台云服务器（VPS）。本教程使用 DigitalOcean 创建。尚未拥有 VPS, 前往 <a href="/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html" title="DigitalOcean服务器创建">DigitalOcean服务器创建</a> 教程。</p>
+<h2 id="二-教程用例"><a href="#二-教程用例" class="headerlink" title="(二) 教程用例"></a>(二) 教程用例</h2><hr>
+<p>注册的网站域名<br>demo.luqifu.tech</p>
+<p>注册的云服务器<br>161.35.59.204 - Ubuntu18.04.3</p>
+<h2 id="三-主要步骤"><a href="#三-主要步骤" class="headerlink" title="(三) 主要步骤"></a>(三) 主要步骤</h2><hr>
+<p>(1) SSH 远程登录 DigitalOcean 云服务器<br>(2) 创建一个 Node.js 应用<br>(3) 安装并使用 Node 应用管理器 PM2<br>(4) DNS 域名和服务器 IP 绑定<br>(5) Nginx 下载，进行反向代理配置</p>
+<h3 id="（1）SSH-远程登录-DigitalOcean-云服务器"><a href="#（1）SSH-远程登录-DigitalOcean-云服务器" class="headerlink" title="（1）SSH 远程登录 DigitalOcean 云服务器"></a>（1）SSH 远程登录 DigitalOcean 云服务器</h3><p>本地控制台输入</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">ssh root@xxx.xxx.xxx.xxx <span class="comment"># 这里，我输入 ssh root@161.35.59.204</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>登陆方式有两种，密码登录 和 SSH keys 登录，我们更推荐后者，后者更方便和安全。<br>如何创建属于您的 SSH 公钥对，请参考教程 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a>。</p>
 <p>成功登录后，界面如下：</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">ssh root@161.35.59.204</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">Last login: Wed Aug 12 01:57:51 2020</span><br><span class="line">root@my-node-server:~<span class="comment">#</span></span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
-<h4 id="（2）创建一个-Node-js-应用"><a href="#（2）创建一个-Node-js-应用" class="headerlink" title="（2）创建一个 Node.js 应用"></a>（2）创建一个 Node.js 应用</h4><figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 成功登录您的服务器后，请执行：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 注意：本教程使用 Ubuntu 的 apt 安装工具包，请选择适合您 OS 的包安装工具：</span></span><br><span class="line"></span><br><span class="line">sudo apt-get update <span class="comment"># 更新服务器的软件库</span></span><br><span class="line">sudo apt-get upgrade <span class="comment"># 更新服务器的软件包</span></span><br><span class="line"></span><br><span class="line">sudo apt-get install nodejs <span class="comment"># 安装 node 包</span></span><br><span class="line">sudo apt-get install npm <span class="comment"># 安装 npm 包</span></span><br></pre></td></tr></tbody></table></figure>
+<h3 id="（2）创建一个-Node-js-应用"><a href="#（2）创建一个-Node-js-应用" class="headerlink" title="（2）创建一个 Node.js 应用"></a>（2）创建一个 Node.js 应用</h3><figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 成功登录您的服务器后，请执行：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 注意：本教程使用 Ubuntu 的 apt 安装工具包，请选择适合您 OS 的包安装工具：</span></span><br><span class="line"></span><br><span class="line">sudo apt-get update <span class="comment"># 更新服务器的软件库</span></span><br><span class="line">sudo apt-get upgrade <span class="comment"># 更新服务器的软件包</span></span><br><span class="line"></span><br><span class="line">sudo apt-get install nodejs <span class="comment"># 安装 node 包</span></span><br><span class="line">sudo apt-get install npm <span class="comment"># 安装 npm 包</span></span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 检查上述包是否安装成功</span></span><br><span class="line"></span><br><span class="line">node -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># v8.10.0 版本号</span></span><br><span class="line"></span><br><span class="line">npm -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.5.2 版本号</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~ <span class="comment"># 进入当前用户目录</span></span><br><span class="line">mkdir HelloWorld <span class="comment"># 创建名为 HelloWorld 的文件夹</span></span><br><span class="line"><span class="built_in">cd</span> HelloWorld <span class="comment"># 进入 HelloWorld 文件夹目录下</span></span><br><span class="line">npm init <span class="comment"># 初始化 npm 库</span></span><br><span class="line">npm install express --save <span class="comment"># 安装 express 依赖</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"># 创建 app.js 文件，实现一个基于 Express 简单的 http 服务器，端口为 3000。</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>)</span><br><span class="line"><span class="keyword">const</span> app = express()</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> {</span><br><span class="line">res.send(<span class="string">'Hello World!'</span>)</span><br><span class="line">})</span><br><span class="line"></span><br><span class="line">app.listen(port, <span class="function">() =&gt;</span> {</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`Example app listening at http://localhost:<span class="subst">${port}</span>`</span>)</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+<p>创建 app.js 文件，实现一个基于 Express 简单的 http 服务器，端口为 3000。</p>
+<figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>)</span><br><span class="line"><span class="keyword">const</span> app = express()</span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> {</span><br><span class="line">res.send(<span class="string">'Hello World!'</span>)</span><br><span class="line">})</span><br><span class="line"></span><br><span class="line">app.listen(port, <span class="function">() =&gt;</span> {</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">`Example app listening at http://localhost:<span class="subst">${port}</span>`</span>)</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
 
-<figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">node app.js               # 运行 app.js</span><br></pre></td></tr></tbody></table></figure>
-
-<p>最后，在 您最喜欢的浏览器中输入<br><code>http://&lt; 您的服务器 IP &gt;:3000</code><br>即可看到 “Hello World” !</p>
-<p>恭喜！到这一步， 你可以通过浏览器访问 服务器 IP 地址，获取基于 Node 创建的 HelloWorld 应用页面 !</p>
-<hr>
-<h4 id="（3）安装-Node-应用管理器-PM2，并且后台运行-Express-js"><a href="#（3）安装-Node-应用管理器-PM2，并且后台运行-Express-js" class="headerlink" title="（3）安装 Node 应用管理器 PM2，并且后台运行 Express.js"></a>（3）安装 Node 应用管理器 PM2，并且后台运行 Express.js</h4><p>使用 PM2 好处：可以后台持续运行 node.js 应用，不用担心服务器重启导致网站关闭。它允许创建,管理和销毁多个 Node.js 应用实例。</p>
+<p>运行 app.js</p>
+<pre><code>node app.js # 运行 app.js</code></pre>
+<p>恭喜！您可以通过浏览器访问<code>http://&lt; 您的服务器 IP &gt;:3000</code>，获取 HelloWorld 应用页面 !</p>
+<h3 id="（3）安装-Node-应用管理器-PM2，并且后台运行-Express-js"><a href="#（3）安装-Node-应用管理器-PM2，并且后台运行-Express-js" class="headerlink" title="（3）安装 Node 应用管理器 PM2，并且后台运行 Express.js"></a>（3）安装 Node 应用管理器 PM2，并且后台运行 Express.js</h3><p>使用 PM2 好处：可以后台持续运行 node.js 应用，不用担心服务器重启导致网站关闭。它允许创建,管理和销毁多个 Node.js 应用实例。</p>
 <p>PM2 官网：<a href="https://pm2.keymetrics.io/">https://pm2.keymetrics.io/</a></p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">npm install pm2 -g <span class="comment"># 在服务器进行 PM2 全局安装</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -37,8 +38,7 @@
 
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 通过执行下列命令，可保证云服务器开机后，pm2 管理器自动运行 Node.js 应用</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看当前所有被 pm2 管理的应用列表</span></span><br><span class="line"></span><br><span class="line">pm2 list</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将当前列表中的所有应用永久储存在 pm2 中</span></span><br><span class="line"></span><br><span class="line">pm2 save</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将 pm2 配置成系统开启服务</span></span><br><span class="line"></span><br><span class="line">pm2 startup</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
-<h4 id="（4）DNS-域名和服务器-IP-绑定"><a href="#（4）DNS-域名和服务器-IP-绑定" class="headerlink" title="（4）DNS 域名和服务器 IP 绑定"></a>（4）DNS 域名和服务器 IP 绑定</h4><p>在您的 DNS 域名提供商的管理界面中，将 ip 地址和域名进行绑定。此教程使用 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 作为域名提供商，请读者根据实际情况进行设置。</p>
+<h3 id="（4）DNS-域名和服务器-IP-绑定"><a href="#（4）DNS-域名和服务器-IP-绑定" class="headerlink" title="（4）DNS 域名和服务器 IP 绑定"></a>（4）DNS 域名和服务器 IP 绑定</h3><p>在您的 DNS 域名提供商的管理界面中，将 ip 地址和域名进行绑定。此教程使用 <a href="https://sg.godaddy.com/zh">GoDaddy</a> 作为域名提供商，请读者根据实际情况进行设置。</p>
 <p>GoDaddy 配置具体步骤：</p>
 <p><span style="color:orange">创建 A 记录：</span><br>key : @<br>value : DigitalOcean 分配的服务器 IP<br>TTL 默认 1h。</p>
 <p><span style="color:orange">创建 CNAME 记录：</span><br>key : www<br>value 为 @<br>TTL 默认 1h。</p>
@@ -46,9 +46,8 @@
 <p>注意，域名和 IP 绑定后，由于网络 DNS 缓存机制，对应关系不会立马生效，实际生效时间快则数分钟，慢则数小时。</p>
 </blockquote>
 <p>检验方法：</p>
-<p>控制台，输入指令 “ping yourdomain.com”, 查看连接状态。如果连接返回来自服务器 IP 的网络包，则代表域名已成功匹配 IP。</p>
-<hr>
-<h4 id="（五）Nginx-下载，进行反向代理配置，域名绑定"><a href="#（五）Nginx-下载，进行反向代理配置，域名绑定" class="headerlink" title="（五）Nginx 下载，进行反向代理配置，域名绑定"></a>（五）Nginx 下载，进行反向代理配置，域名绑定</h4><figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 本教程使用 Ubuntu18.04.3 操作系统，请根据您 OS 版本进行 Nginx 安装。</span></span><br><span class="line"></span><br><span class="line">sudo apt update <span class="comment"># 更新软件库</span></span><br><span class="line">sudo apt install nginx <span class="comment"># 下载 nginx</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> nginx <span class="comment"># 配置 nginx 作为开机服务</span></span><br></pre></td></tr></tbody></table></figure>
+<p>打开控制台，输入指令 <code>ping yourdomain.com</code>, 查看连接状态。如果连接返回来自服务器 IP 的网络包，则代表域名已成功匹配 IP。</p>
+<h3 id="（5）Nginx-下载，进行反向代理配置，域名绑定"><a href="#（5）Nginx-下载，进行反向代理配置，域名绑定" class="headerlink" title="（5）Nginx 下载，进行反向代理配置，域名绑定"></a>（5）Nginx 下载，进行反向代理配置，域名绑定</h3><figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 本教程使用 Ubuntu18.04.3 操作系统，请根据您 OS 版本进行 Nginx 安装。</span></span><br><span class="line"></span><br><span class="line">sudo apt update <span class="comment"># 更新软件库</span></span><br><span class="line">sudo apt install nginx <span class="comment"># 下载 nginx</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> nginx <span class="comment"># 配置 nginx 作为开机服务</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>当 nginx 下载后，在本地浏览器输入 <a href="http://161.35.59.204/">http://161.35.59.204:80/</a><br>看到 nginx 页面，表示 nginx 服务已经运行起来。</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 打开 nginx 默认配置文件</span></span><br><span class="line"></span><br><span class="line">sudo nano /etc/nginx/nginx.conf</span><br></pre></td></tr></tbody></table></figure>
@@ -65,11 +64,12 @@
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line">Nginx -t <span class="comment"># 修改后检查配置文件格式</span></span><br><span class="line">nginx -s reload <span class="comment"># 让 nginx 重新读取 conf 配置</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>现在，在浏览器中直接访问域名，就能直接访问 Helloworld 网页。</p>
-<h4 id="（六）防火墙端口-80-443-端口配置"><a href="#（六）防火墙端口-80-443-端口配置" class="headerlink" title="（六）防火墙端口 80/443 端口配置"></a>（六）防火墙端口 80/443 端口配置</h4><p>但是，为了提高网站安全性，我们不希望用户通过 3000 端口访问网站。相反，应该在服务器端配置防火墙，只允许用户通过 80(HTTP)和 443（HTTPS）端口访问网站,</p>
+<h3 id="（6）防火墙端口-80-443-端口配置"><a href="#（6）防火墙端口-80-443-端口配置" class="headerlink" title="（6）防火墙端口 80/443 端口配置"></a>（6）防火墙端口 80/443 端口配置</h3><p>但是，为了提高网站安全性，我们不希望用户通过 3000 端口访问网站。相反，应该在服务器端配置防火墙，只允许用户通过 80(HTTP)和 443（HTTPS）端口访问网站,</p>
 <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 安装防火墙</span></span><br><span class="line"></span><br><span class="line">sudo apt update</span><br><span class="line">sudo apt install ufw</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启防火墙</span></span><br><span class="line"></span><br><span class="line">sudo ufw <span class="built_in">enable</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置防火墙禁用所有端口</span></span><br><span class="line"></span><br><span class="line">sudo ufw default deny</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置防火墙开启特定端口 ( ssh:22 | http:80 | https: 443 )</span></span><br><span class="line"></span><br><span class="line">sudo ufw allow ssh</span><br><span class="line">sudo ufw allow http</span><br><span class="line">sudo ufw allow https</span><br></pre></td></tr></tbody></table></figure>
 
 <p>现在，浏览器只能通过 80 / 443 端口访问网站页面。<br>相信在你最喜爱的浏览器输入 <a href="http://demo.luqifu.tech/">http://demo.luqifu.tech</a> , 就能看到所部署的应用。<br>如果您希望为网站配置 HTTPS ( 443 ) 访问，请参考教程 <a href="/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE.html" title="在Nginx中为Node应用添加HTTPS访问">在Nginx中为Node应用添加HTTPS访问</a>。</p>
-<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>至此，本教程结束。</p>
+<h2 id="四-结语"><a href="#四-结语" class="headerlink" title="(四) 结语"></a>(四) 结语</h2><hr>
+<p>至此，本教程结束。</p>
 <p>这是我最近云端部署 Node 应用的一些心得，希望能帮到大家。</p>
 <p>非常感谢。</p>
 <script>
@@ -102,39 +102,91 @@
       </tags>
   </entry>
   <entry>
+    <title>创建DigitalOcean服务器实例Droplet</title>
+    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
+<h2 id="一-前言"><a href="#一-前言" class="headerlink" title="(一) 前言"></a>(一) 前言</h2><hr>
+<p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
+<h2 id="二-注册账户"><a href="#二-注册账户" class="headerlink" title="(二) 注册账户"></a>(二) 注册账户</h2><hr>
+<p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
+<h2 id="三-创建项目"><a href="#三-创建项目" class="headerlink" title="(三) 创建项目"></a>(三) 创建项目</h2><hr>
+<h3 id="1-登录账户后-创建-new-project"><a href="#1-登录账户后-创建-new-project" class="headerlink" title="1.登录账户后, 创建 new project."></a>1.登录账户后, 创建 new project.</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
+<h3 id="2-填写您的项目名称，描述和用途。"><a href="#2-填写您的项目名称，描述和用途。" class="headerlink" title="2.填写您的项目名称，描述和用途。"></a>2.填写您的项目名称，描述和用途。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
+<h3 id="3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
+<h3 id="4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
+<h3 id="5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h3><blockquote>
+<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
+</blockquote>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
+<h3 id="6-自定义主机名，创建-Droplet"><a href="#6-自定义主机名，创建-Droplet" class="headerlink" title="6.自定义主机名，创建 Droplet"></a>6.自定义主机名，创建 Droplet</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
+<h3 id="7-创建完成后，获取-Droplet-的公网-IP"><a href="#7-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="7.创建完成后，获取 Droplet 的公网 IP"></a>7.创建完成后，获取 Droplet 的公网 IP</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
+<h3 id="8-检查云服务器是否激活"><a href="#8-检查云服务器是否激活" class="headerlink" title="8.检查云服务器是否激活"></a>8.检查云服务器是否激活</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
+<h2 id="四-结语"><a href="#四-结语" class="headerlink" title="(四) 结语"></a>(四) 结语</h2><hr>
+<p>恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>DigitalOcean</tag>
+        <tag>Cloud Deployment</tag>
+        <tag>VPS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用Let&#39;s Encrypt在Nginx中为Node应用添加HTTPS访问</title>
     <url>/post/%E4%BD%BF%E7%94%A8let-s-encrypt%E5%9C%A8nginx%E4%B8%AD%E4%B8%BAnode%E5%BA%94%E7%94%A8%E6%B7%BB%E5%8A%A0https%E8%AE%BF%E9%97%AE.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文讲述利用 Let’s Encrypt 生成 ssl 证书，将证书配置到 Nginx 反向代理，使 node.js 应用实现 https 访问。</p>
-<h2 id="什么是-http-协议？"><a href="#什么是-http-协议？" class="headerlink" title="什么是 http 协议？"></a>什么是 http 协议？</h2><p>HTTP ( HyperText Transfer Protocol )协议, 又称超文本传输协议, 是一种用于分布式、协作式和超媒体信息系统的应用层协议。它是一种用于分布式、协作式和超媒体信息系统的应用层协议，也是万维网的数据通信的基础。设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。通过 HTTP 或者 HTTPS 协议请求的资源由统一资源标识符（Uniform Resource Identifiers，URI）来标识。<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">来源: 维基百科</a></p>
-<h2 id="http-和-https-的区别"><a href="#http-和-https-的区别" class="headerlink" title="http 和 https 的区别"></a>http 和 https 的区别</h2><p>HTTP 协议传输的数据都是明文传输的，因此使用 HTTP 协议视为安全性不足。为了保证这些隐私数据能加密传输，网景公司设计了 SSL（Secure Sockets Layer）协议用于对 HTTP 协议传输的数据进行加密，从而就诞生了 HTTPS。简单来说，HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，要比 http 协议安全。</p>
+<h2 id="一-什么是-http-协议？"><a href="#一-什么是-http-协议？" class="headerlink" title="(一) 什么是 http 协议？"></a>(一) 什么是 http 协议？</h2><hr>
+<p>HTTP ( HyperText Transfer Protocol )协议, 又称超文本传输协议, 是一种用于分布式、协作式和超媒体信息系统的应用层协议。它是一种用于分布式、协作式和超媒体信息系统的应用层协议，也是万维网的数据通信的基础。设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。通过 HTTP 或者 HTTPS 协议请求的资源由统一资源标识符（Uniform Resource Identifiers，URI）来标识。<a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">来源: 维基百科</a></p>
+<h2 id="二-http-和-https-的区别"><a href="#二-http-和-https-的区别" class="headerlink" title="(二) http 和 https 的区别"></a>(二) http 和 https 的区别</h2><hr>
+<p>HTTP 协议传输的数据都是明文传输的，因此使用 HTTP 协议视为安全性不足。为了保证这些隐私数据能加密传输，网景公司设计了 SSL（Secure Sockets Layer）协议用于对 HTTP 协议传输的数据进行加密，从而就诞生了 HTTPS。简单来说，HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，要比 http 协议安全。</p>
 <blockquote>
 <p>HTTP 协议使用 80 端口，HTTPS 协议使用 443 端口。</p>
 </blockquote>
-<h2 id="关于-SSL-安全证书"><a href="#关于-SSL-安全证书" class="headerlink" title="关于 SSL 安全证书"></a>关于 SSL 安全证书</h2><p>要为网站实现 HTTPS 访问，我们需要一张具有公信力的 CA （ Certificate Authority ）也就是证书授权中心颁发的 SSL 安全证书，并且将它部署到你的网站服务器上。此教程将会使用 <code>Let's Encrypt &amp; Certbot</code> 生成 SSL 安全证书。</p>
+<h2 id="三-关于-SSL-安全证书"><a href="#三-关于-SSL-安全证书" class="headerlink" title="(三) 关于 SSL 安全证书"></a>(三) 关于 SSL 安全证书</h2><hr>
+<p>要为网站实现 HTTPS 访问，我们需要一张具有公信力的 CA （ Certificate Authority ）也就是证书授权中心颁发的 SSL 安全证书，并且将它部署到你的网站服务器上。此教程将会使用 <code>Let's Encrypt &amp; Certbot</code> 生成 SSL 安全证书。</p>
 <blockquote>
 <p>Let’s Encrypt 是一个于 2015 年三季度推出的数字证书认证机构，旨在以自动化流程消除手动创建和安装证书的复杂流程，为安全网站提供免费的传输层安全性协议（TLS）证书。</p>
 </blockquote>
-<h2 id="为网站添加-HTTPS-访问"><a href="#为网站添加-HTTPS-访问" class="headerlink" title="为网站添加 HTTPS 访问"></a>为网站添加 HTTPS 访问</h2><blockquote>
+<h2 id="四-为网站添加-HTTPS-访问"><a href="#四-为网站添加-HTTPS-访问" class="headerlink" title="(四) 为网站添加 HTTPS 访问"></a>(四) 为网站添加 HTTPS 访问</h2><hr>
+<blockquote>
 <p>这里，我将演示如何使用 Certbot 为 nginx 服务器添加 ssl 证书</p>
 </blockquote>
-<h3 id="一-访问-Certbot-官网-https-certbot-eff-org"><a href="#一-访问-Certbot-官网-https-certbot-eff-org" class="headerlink" title="(一) 访问 Certbot 官网 https://certbot.eff.org/"></a>(一) 访问 Certbot 官网 <a href="https://certbot.eff.org/">https://certbot.eff.org/</a></h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg"></p>
-<hr>
-<h3 id="二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。"><a href="#二-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。" class="headerlink" title="(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。"></a>(二) Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg"></p>
-<hr>
-<h3 id="三-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#三-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="(三) 按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>(三) 按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><blockquote>
-<p><code>由于不同系统下，certbot 配置 ssl 证书方式不同。请务必根据 certbot 给出的指令执行。</code><br>本教程是在 <strong>ubuntu18.04.3</strong> 版本下使用 <strong>nginx</strong> 服务器，因此 Certbot 给出了下列指令:</p>
-</blockquote>
-<h4 id="1-SSH-远程登录到网站服务器"><a href="#1-SSH-远程登录到网站服务器" class="headerlink" title="1. SSH 远程登录到网站服务器"></a>1. SSH 远程登录到网站服务器</h4><p>使用 SSH 登录到部署网站的服务器，并且登录用户必须具有 sudo 权限。</p>
-<h4 id="2-添加-Certbot-PPA"><a href="#2-添加-Certbot-PPA" class="headerlink" title="2. 添加 Certbot PPA"></a>2. 添加 Certbot PPA</h4><p>在服务器上添加 Certbot PPA 到包列表，执行下列操作:</p>
+<h3 id="1-访问-Certbot-官网"><a href="#1-访问-Certbot-官网" class="headerlink" title="1.访问 Certbot 官网"></a>1.访问 <a href="https://certbot.eff.org/">Certbot 官网</a></h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300452/tech_blog/certbot_ssl_node/step1.jpg"></p>
+<h3 id="2-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。"><a href="#2-Certbot-将基于您的-HTTP-server-类型-以及-服务器操作系统，为你选择合适的安装方案。" class="headerlink" title="2.Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。"></a>2.Certbot 将基于您的 HTTP server 类型 以及 服务器操作系统，为你选择合适的安装方案。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597300859/tech_blog/certbot_ssl_node/step2.jpg"></p>
+<h3 id="3-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。"><a href="#3-按照-Cerbot-官网给出的指令，为服务器安装并配置-ssl-证书。" class="headerlink" title="3.按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。"></a>3.按照 Cerbot 官网给出的指令，为服务器安装并配置 ssl 证书。</h3><p>由于不同系统下，certbot 配置 ssl 证书方式不同。请务必根据 certbot 给出的指令执行。</p>
+<h3 id="4-本教程是在-ubuntu18-04-3-版本下使用-nginx-服务器，因此-Certbot-给出了下列指令"><a href="#4-本教程是在-ubuntu18-04-3-版本下使用-nginx-服务器，因此-Certbot-给出了下列指令" class="headerlink" title="4.本教程是在 ubuntu18.04.3 版本下使用 nginx 服务器，因此 Certbot 给出了下列指令:"></a>4.本教程是在 <strong>ubuntu18.04.3</strong> 版本下使用 <strong>nginx</strong> 服务器，因此 Certbot 给出了下列指令:</h3><h4 id="首先，-SSH-远程登录到网站服务器"><a href="#首先，-SSH-远程登录到网站服务器" class="headerlink" title="首先， SSH 远程登录到网站服务器"></a>首先， SSH 远程登录到网站服务器</h4><p>使用 SSH 登录到部署网站的服务器，并且登录用户必须具有 sudo 权限。</p>
+<h4 id="接着，-添加-Certbot-PPA"><a href="#接着，-添加-Certbot-PPA" class="headerlink" title="接着， 添加 Certbot PPA"></a>接着， 添加 Certbot PPA</h4><p>在服务器上添加 Certbot PPA 到包列表，执行下列操作:</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br><span class="line">sudo add-apt-repository universe</span><br><span class="line">sudo add-apt-repository ppa:certbot/certbot</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></tbody></table></figure>
 
-<h4 id="3-安装-Certbot"><a href="#3-安装-Certbot" class="headerlink" title="3. 安装 Certbot"></a>3. 安装 Certbot</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">sudo apt-get install certbot python3-certbot-nginx</span><br></pre></td></tr></tbody></table></figure>
+<h4 id="安装-Certbot"><a href="#安装-Certbot" class="headerlink" title="安装 Certbot"></a>安装 Certbot</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">sudo apt-get install certbot python3-certbot-nginx</span><br></pre></td></tr></tbody></table></figure>
 
-<h4 id="4-配置-SSL-证书到-nginx-服务器上"><a href="#4-配置-SSL-证书到-nginx-服务器上" class="headerlink" title="4. 配置 SSL 证书到 nginx 服务器上"></a>4. 配置 SSL 证书到 nginx 服务器上</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">sudo certbot --nginx</span><br></pre></td></tr></tbody></table></figure>
+<h4 id="然后，配置-SSL-证书到-nginx-服务器上"><a href="#然后，配置-SSL-证书到-nginx-服务器上" class="headerlink" title="然后，配置 SSL 证书到 nginx 服务器上"></a>然后，配置 SSL 证书到 nginx 服务器上</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">sudo certbot --nginx</span><br></pre></td></tr></tbody></table></figure>
 
-<h4 id="5-检查证书自动更新功能"><a href="#5-检查证书自动更新功能" class="headerlink" title="5. 检查证书自动更新功能"></a>5. 检查证书自动更新功能</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line"># certbot生成的ssl证书，有效期为90天</span><br><span class="line"># 我们需要定期手动更新证书; 或者使用Unix系统下的定时任务工具cron定期执行</span><br><span class="line"></span><br><span class="line">sudo certbot renew --dry-run</span><br></pre></td></tr></tbody></table></figure>
+<h4 id="最后，检查证书自动更新功能"><a href="#最后，检查证书自动更新功能" class="headerlink" title="最后，检查证书自动更新功能"></a>最后，检查证书自动更新功能</h4><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line"># certbot生成的ssl证书，有效期为90天</span><br><span class="line"># 我们需要定期手动更新证书; 或者使用Unix系统下的定时任务工具cron定期执行</span><br><span class="line"></span><br><span class="line">sudo certbot renew --dry-run</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="（四）-使用-https-访问您的网站"><a href="#（四）-使用-https-访问您的网站" class="headerlink" title="（四） 使用 https 访问您的网站"></a>（四） 使用 https 访问您的网站</h3><p>恭喜你，你已经可以使用 <a href="https://yourwebsite.com/">https://yourwebsite.com/</a> 访问您的网站 !</p>
+<h2 id="五-使用-https-访问您的网站"><a href="#五-使用-https-访问您的网站" class="headerlink" title="(五) 使用 https 访问您的网站"></a>(五) 使用 https 访问您的网站</h2><hr>
+<p>恭喜你，你已经可以使用 <a href="https://yourwebsite.com/">https://yourwebsite.com/</a> 访问您的网站 !</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -168,31 +220,30 @@
     <title>使用ssh-keygen创建SSH公钥创建教程</title>
     <url>/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 ssh-keygen 命令创建属于您的公私钥对。</p>
-<h2 id="为什么需要-SSH-Keys"><a href="#为什么需要-SSH-Keys" class="headerlink" title="为什么需要 SSH Keys ?"></a>为什么需要 SSH Keys ?</h2><p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
-<h2 id="什么是-ssh-keygen"><a href="#什么是-ssh-keygen" class="headerlink" title="什么是 ssh-keygen ?"></a>什么是 ssh-keygen ?</h2><p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
-<ul>
-<li><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code></li>
-<li><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></li>
-</ul>
-<h2 id="SSH-key-创建流程"><a href="#SSH-key-创建流程" class="headerlink" title="SSH key 创建流程"></a>SSH key 创建流程</h2><h3 id="（一）首先检查-ssh-client-是否已安装在系统中"><a href="#（一）首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="（一）首先检查 ssh client 是否已安装在系统中"></a>（一）首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台，输入 <code>ssh</code></p>
-<p>如果看见下列提示选项，则代表 ssh 命令可用</p>
-<figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">&gt; ssh</span><br><span class="line">usage: ssh [-46Yy][-b bind_interface]</span><br><span class="line">[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file] [-e escape_char][-f configfile] [-I pkcs11][-i identity_file] [-J [user@]host[:port]][-l address]</span><br><span class="line">[-l login_name][-m mac_spec] [-O ctl_cmd][-o option] [-p port][-q query_option] [-R address][-s ctl_path] [-W host:port]-w local_tun[:remote_tun]] destination [command]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="一-什么是-ssh-keygen"><a href="#一-什么是-ssh-keygen" class="headerlink" title="(一) 什么是 ssh-keygen ?"></a>(一) 什么是 ssh-keygen ?</h2><hr>
+<p>ssh-keygen 是 Unix 和类 Unix 计算机系统上的安全外壳（SSH）协议套件的标准组件，用于通过使用各种加密技术在不安全的网络上建立远程计算机之间的安全 shell 会话。<br>我们可以使用 ssh-keygen 生成，管理和转换身份验证密钥。本教程将会讲述使用 <code>ssh-keygen</code> 工具生成一对 <code>public key (公钥)</code> 和 <code>private key (私钥)</code>。</p>
+<p><code>公钥一般存放于支持 SSH 协议的服务器中，如云服务器，git远程仓库。</code><br><code>私钥则保存于客户端，如用户电脑。切不可外泄，因为它是服务端验证客户端身份的令牌。</code></p>
+<h2 id="二-为什么需要-SSH-Keys"><a href="#二-为什么需要-SSH-Keys" class="headerlink" title="(二) 为什么需要 SSH Keys ?"></a>(二) 为什么需要 SSH Keys ?</h2><hr>
+<p>在 SSH 协议出现之前，我们常使用比如 telnent, ftp 这类型应用层协议进行客户端与服务器端的信息交互。然而，这些协议并不安全，这是因为他们是明文传输客户端与服务端的身份验证信息，例如用户名和密码。也就意味着用户更容易受到臭名昭著的 “中间人攻击 ( Man-in-the-middle attack )”。SSH 协议为了确保信息的安全传输，从连接发起到完成各阶段的各个点 SSH 协议采用了许多不同类型的数据加密技术，包括可逆的对称加密，非对称加密以及不可逆的哈希散列。因此，我们认为 SSH 协议更加安全可靠。</p>
+<h2 id="三-SSH-key-创建流程"><a href="#三-SSH-key-创建流程" class="headerlink" title="(三) SSH key 创建流程"></a>(三) SSH key 创建流程</h2><hr>
+<h3 id="1-首先检查-ssh-client-是否已安装在系统中"><a href="#1-首先检查-ssh-client-是否已安装在系统中" class="headerlink" title="1.首先检查 ssh client 是否已安装在系统中"></a>1.首先检查 ssh client 是否已安装在系统中</h3><p>打开本地控制台</p>
+<p>1.检查 <code>ssh</code> 命令是否可用</p>
+<pre><code>&gt; ssh
 
-<blockquote>
+usage: ssh [-46Yy][-b bind_interface]
+[-b bind_address][-c cipher_spec] [-D [bind_address:]port][-e log_file]
+...</code></pre>
 <p>如果 ssh 命令不可用，则按照下列指示安装 openssh 服务。</p>
-</blockquote>
 <h6 id="对于-window-用户："><a href="#对于-window-用户：" class="headerlink" title="对于 window 用户："></a>对于 window 用户：</h6><p>进入 <code>设置</code>-<code>应用</code>-<code>应用和功能</code>-<code>管理可选功能</code>-<code>添加功能</code> - <code>安装 OpenSSH 服务器和客户端</code>，</p>
 <h6 id="对于-mac-Unix-用户："><a href="#对于-mac-Unix-用户：" class="headerlink" title="对于 mac / Unix 用户："></a>对于 mac / Unix 用户：</h6><p>系统应该自带了 ssh 服务，我们可以直接使用 ssh-keygen 命令</p>
-<hr>
-<h3 id="（二）ssh-服务安装后，创建密钥："><a href="#（二）ssh-服务安装后，创建密钥：" class="headerlink" title="（二）ssh 服务安装后，创建密钥："></a>（二）ssh 服务安装后，创建密钥：</h3><p>打开本地控制台，输入</p>
+<h3 id="2-使用-ssh-keygen-创建密钥："><a href="#2-使用-ssh-keygen-创建密钥：" class="headerlink" title="2.使用 ssh-keygen 创建密钥："></a>2.使用 ssh-keygen 创建密钥：</h3><p>打开本地控制台，输入</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line"># 指定 –t 选项 使用类型为rsa创建密钥对。</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></tbody></table></figure>
 
 <p>密钥创建过程中，需要按下多次回车键, 即默认值创建。</p>
-<hr>
-<h3 id="（三）获取密钥："><a href="#（三）获取密钥：" class="headerlink" title="（三）获取密钥："></a>（三）获取密钥：</h3><p>创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：<br>Window：<code>C:\Users\{你的用户名}\\.ssh</code><br>Mac / Unix： <code>~/.ssh</code></p>
+<h3 id="3-获取创建的密钥："><a href="#3-获取创建的密钥：" class="headerlink" title="3.获取创建的密钥："></a>3.获取创建的密钥：</h3><p>创建完成后，系统会将新创建的密钥对保存在用户的.ssh 目录下。例如：<br>Window：<code>C:\Users\{你的用户名}\\.ssh</code><br>Mac / Unix： <code>~/.ssh</code></p>
 <p>进入<code>.ssh</code> 目录，就能看到刚刚创建的公钥文件<code>id_rsa.pub</code> 和 私钥文件<code>id_rsa</code>。<strong>切记，私钥文件不能外泄；公钥则根据实际需要，保存到带有 SSH server 的服务器中</strong>。</p>
-<hr>
-<h2 id="结语："><a href="#结语：" class="headerlink" title="结语："></a>结语：</h2><p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
+<h2 id="结语："><a href="#结语：" class="headerlink" title="结语："></a>结语：</h2><hr>
+<p>恭喜你，你已经拥有了能用于加解密的公钥对！<br>至此，本教程结束。非常感谢。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -221,77 +272,22 @@
       </tags>
   </entry>
   <entry>
-    <title>创建DigitalOcean服务器实例Droplet</title>
-    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
-    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
-<h2 id="注册账户"><a href="#注册账户" class="headerlink" title="注册账户"></a>注册账户</h2><p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
-<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><hr>
-<h4 id="一-登录账户后-创建-new-project"><a href="#一-登录账户后-创建-new-project" class="headerlink" title="(一) 登录账户后, 创建 new project."></a>(一) 登录账户后, 创建 new project.</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
-<hr>
-<h4 id="二-填写您的项目名称，描述和用途。"><a href="#二-填写您的项目名称，描述和用途。" class="headerlink" title="(二) 填写您的项目名称，描述和用途。"></a>(二) 填写您的项目名称，描述和用途。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
-<hr>
-<h4 id="三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#三-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>(三) 项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
-<hr>
-<h4 id="四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#四-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>(四) 选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
-<hr>
-<h4 id="五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#五-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>(五) 建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h4><blockquote>
-<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
-</blockquote>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
-<hr>
-<h4 id="六-自定义主机名，创建-Droplet"><a href="#六-自定义主机名，创建-Droplet" class="headerlink" title="(六) 自定义主机名，创建 Droplet"></a>(六) 自定义主机名，创建 Droplet</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
-<hr>
-<h4 id="七-创建完成后，获取-Droplet-的公网-IP"><a href="#七-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="(七) 创建完成后，获取 Droplet 的公网 IP"></a>(七) 创建完成后，获取 Droplet 的公网 IP</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
-<hr>
-<h4 id="八-检查云服务器是否激活"><a href="#八-检查云服务器是否激活" class="headerlink" title="(八) 检查云服务器是否激活"></a>(八) 检查云服务器是否激活</h4><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
-<hr>
-<h4 id="九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。"><a href="#九-恭喜你，你已经拥有了一台-DigitalOcean-的云端服务器。" class="headerlink" title="(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。"></a>(九) 恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</h4><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Cloud Deployment</category>
-      </categories>
-      <tags>
-        <tag>DigitalOcean</tag>
-        <tag>Cloud Deployment</tag>
-        <tag>VPS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>DevOps篇 - 关于Docker入门教程</title>
     <url>/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述 Docker 的基本概念以及仓库，镜像，容器的使用。</p>
-<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="( 一 ) 什么是 Docker？"></a>( 一 ) 什么是 Docker？</h2><hr>
+<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="(一) 什么是 Docker？"></a>(一) 什么是 Docker？</h2><hr>
 <p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。</p>
 <p>开发者通过 Docker 打包他们的应用以及与应用相关的依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，开发者通过 Docker 提供的命令对应用容器进行创建，运行，管理，以及销毁。</p>
-<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="( 二 ) 为什么需要 Docker？"></a>( 二 ) 为什么需要 Docker？</h2><hr>
+<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="(二) 为什么需要 Docker？"></a>(二) 为什么需要 Docker？</h2><hr>
 <p>使用 Docker 的最大好处就是，根本上解决了软件应用由于运行在不同机器而产生一系列环境冲突的问题。</p>
 <p>举个例子，我们在自己的电脑上编写基于 Python3.7 语法的脚本，可以被本机上 python3 的解释器所识别以及运行。但是，却没办法保证这一脚本可以在别的平台的机器上运行。这正是因为程序员开发的脚本，应用, 程序无一不依赖着机器本身所处的环境。</p>
 <p>而 Docker 作为应用容器，允许程序员把应用的源代码，以及相关依赖包，一系列环境参数，统一封装和打包到容器之中；并且由于容器的可移植性，应用就可以运行在不同的平台之上。</p>
-<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="( 三 ) Docker 和虚拟机"></a>( 三 ) Docker 和虚拟机</h2><hr>
+<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="(三) Docker 和虚拟机"></a>(三) Docker 和虚拟机</h2><hr>
 <p>(1) Docker 有着比虚拟机更少的抽象层。由于 docker 不需要 Hypervisor 实现硬件资源虚拟化，运行在 docker 容器上的程序直接使用的都是实际物理机的硬件资源。因此在 CPU、内存利用率上 docker 将会在效率上有优势。</p>
 <p>(2) Docker 利用的是宿主机的内核，而不需要 Guest OS。因此，当新建一个容器时，docker 不需要和虚拟机一样重新加载一个操作系统内核。</p>
 <p>(3) Docker 容器的启动是秒级的；而虚拟机启动是分钟级的。</p>
 <p>(4) 一般而言，一台电脑借由虚拟机可以最多同时运行 2，3 个不同的操作系统；却可以同时运行上千个 Docker 容器。</p>
-<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="( 四 ) 安装 Docker"></a>( 四 ) 安装 Docker</h2><hr>
+<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="(四) 安装 Docker"></a>(四) 安装 Docker</h2><hr>
 <p>1.请进入 <a href="https://hub.docker.com/">Docker 官网</a>, 注册您的 DockerHub 账户。</p>
 <p>2.下载，安装，配置 Docker Desktop。</p>
 <ul>
@@ -306,7 +302,7 @@ Docker version 19.03.12, build 48a662</code></pre>
 <pre><code>&gt; docker images
 REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
 #         #      #         #      #</code></pre>
-<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="( 五 ) Docker 基本知识"></a>( 五 ) Docker 基本知识</h2><hr>
+<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="(五) Docker 基本知识"></a>(五) Docker 基本知识</h2><hr>
 <ul>
 <li><p>仓库 Repository<br>为开发者提供一系列打包好的官网应用镜像，第三方应用镜像源</p>
 </li>
@@ -318,7 +314,7 @@ REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
 </li>
 </ul>
 <p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
-<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="( 六 ) Docker 仓库 Dockerhub"></a>( 六 ) Docker 仓库 Dockerhub</h2><hr>
+<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="(六) Docker 仓库 Dockerhub"></a>(六) Docker 仓库 Dockerhub</h2><hr>
 <p>正如上文提及，Docker 容器都是基于镜像 Image 创建的。那么如何获取镜像呢？</p>
 <p>比如，官方镜像仓库 <a href="https://hub.docker.com/">DockerHub</a> 为我们提供了大量优质的官方镜像。</p>
 <p>打开命令行终端，</p>
@@ -335,7 +331,7 @@ REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
 ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 <p>4.登出 DockerHub</p>
 <pre><code>&gt; docker logout</code></pre>
-<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="( 七 ) Docker 镜像指令"></a>( 七 ) Docker 镜像指令</h2><hr>
+<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="(七) Docker 镜像指令"></a>(七) Docker 镜像指令</h2><hr>
 <p>1.从仓库获取镜像</p>
 <pre><code>&gt; docker pull &lt;镜像仓库名&gt;:&lt;版本号&gt;</code></pre>
 <p>2.查询本地所有存在镜像</p>
@@ -351,7 +347,7 @@ ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 
 # 使用 `push` 命令推送到自己的DockerHub仓库上。
 &gt; docker push username/&lt;自定义镜像名&gt;:&lt;版本号&gt;</code></pre>
-<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="( 八 ) Docker 容器 Container"></a>( 八 ) Docker 容器 Container</h2><hr>
+<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="(八) Docker 容器 Container"></a>(八) Docker 容器 Container</h2><hr>
 <p>容器各种状态：</p>
 <p>created（已创建）<br>restarting（重启中）<br>running（运行中）<br>removing（迁移中）<br>paused（暂停）<br>exited（停止）<br>dead（死亡）</p>
 <p>1.基于镜像，创建并运行容器</p>
@@ -417,7 +413,7 @@ ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 # 另外 docker load 命令也可以导入一个镜像存储文件
 # import：丢弃了所有的历史记录和元数据信息，仅保存容器当时的快照状态。在导入的时候可以重新制定标签等元数据信息。
 # load：将保存完整记录，体积较大。</code></pre>
-<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="( 九 ) 容器数据持久化及共享"></a>( 九 ) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
+<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="(九) 容器数据持久化及共享"></a>(九) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
 <p>Docker 提供了 3 种持久化数据的方式：</p>
 <p>volumes：存于主机文件系统中 Docker 管理的目录下，解决了跨平台间资料权限和路径引用问题。<br>bind mount：存于主机文件系统中的任意位置。可能由于不同平台间权限和路径引用不同而发生冲突。<br>tmpfs mount（Linux 中）：存于内存中（注意，并不是持久化到磁盘）。在容器的生命周期中，它能被容器用来存放非持久化的状态或敏感信息。</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg"></p>
@@ -468,7 +464,7 @@ local     my-vol</code></pre>
 <h3 id="使用数据卷容器"><a href="#使用数据卷容器" class="headerlink" title="使用数据卷容器"></a>使用数据卷容器</h3><p>数据卷容器,顾名思义本身就是个 Docker 容器，只是充当了储存并共享容器数据的角色。<br>我们使用 <code>--volumes-from</code> 命令，将某个容器 volume 的挂载到另一个容器上。</p>
 <p>假如当前有 my-app1 容器，已经与本机实现了 volume 挂载。<br>执行下列命令，将创建 my-app2 容器，并且将 volume 来源 直接挂载到 my-app1 容器</p>
 <pre><code>&gt; docker run --volumes-from &lt;my-app1 容器ID&gt; --name my-app2 -i -t ubuntu /bin/bash</code></pre>
-<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><hr>
+<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="十-结语"><a href="#十-结语" class="headerlink" title="(十) 结语"></a>(十) 结语</h2><hr>
 <p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程，我们将会讲述如何使用 dockerfile 创建 image。</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -502,11 +498,12 @@ local     my-vol</code></pre>
     <title>网页开发之跨域请求CORS的实现-下篇</title>
     <url>/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过本教程，您将会了解如何解决网页开发中的跨域请求（CORS）中的冲突。<br>如果您不清楚什么是跨域请求和跨域冲突，建议请先阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>
-<h2 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h2><p>本文会从 <span style="border-bottom:1px solid yellow">开发模式</span> 和 <span style="border-bottom:1px solid yellow">生产模式</span> 下探讨跨域冲突的解决方案。</p>
-<hr>
-<h2 id="开发模式"><a href="#开发模式" class="headerlink" title="开发模式"></a>开发模式</h2><p>开发模式下的跨域冲突，往往是因为前后端分离开发所导致的。</p>
-<p>一个实际场景是，网页开发者使用 Vue,react 等前端框架进行本地开发，把前端页面运行在 <code>localhost:8080</code>。而服务器开发者使用了 Node.js 或者 Java 语言搭建了后端服务器，运行在 <code>localhost:8081</code>。并且使用预先设定好的 API 接口进行数据传输。<span style="color:yellow">虽然前后端都在 localhost 下进行开发，可由于使用端口不一致，前后端就产生了跨域冲突</span>。</p>
-<p>想要解决开发模式下的跨域冲突很简单，如果使用的是 webpack 项目，只需要在 webpack 配置文件 webpack.config.js 中添加 <code>devServer（代理服务器）</code> 配置。项目开启后，原有的页面请求会先被转发到代理服务器 devServer，代理服务器重写 请求 URL，转发至目标服务器，实现跨域。</p>
+<h2 id="一-主要内容"><a href="#一-主要内容" class="headerlink" title="(一) 主要内容"></a>(一) 主要内容</h2><hr>
+<p>本文会从 <span style="border-bottom:1px solid yellow">开发模式</span> 和 <span style="border-bottom:1px solid yellow">生产模式</span> 下探讨跨域冲突的解决方案。</p>
+<h2 id="二-开发模式"><a href="#二-开发模式" class="headerlink" title="(二) 开发模式"></a>(二) 开发模式</h2><hr>
+<p>开发模式下的跨域冲突，往往是因为前后端分离开发,端口不一致所导致的。</p>
+<p>例如，网页开发者使用 Vue,react 等前端框架进行本地开发，把前端页面运行在 <code>localhost:8080</code>。而服务器开发者使用了 Node.js 或者 Java 语言搭建了后端服务器，运行在 <code>localhost:8081</code>。由于使用端口不一致，前后端就产生了跨域冲突。</p>
+<p>想要解决开发模式下的跨域冲突很简单，如果使用的是 webpack 项目，只需要在 webpack 配置文件 webpack.config.js 中添加 <code>devServer（代理服务器）</code> 配置。</p>
 <p>例如有这一场景：</p>
 <p><span style="color:orange">客户端网页:</span><br><a href="http://localhost:8080/index.html">http://localhost:8080/index.html</a></p>
 <p><span style="color:orange">代理服务器:</span><br><a href="http://localhost:8080/">http://localhost:8080/</a></p>
@@ -523,11 +520,13 @@ local     my-vol</code></pre>
 
 模式 B
 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域冲突）</code></pre>
-<p>开发模式下的跨域冲突的解决，实际上只是利用前端框架所自带的代理服务器，进行请求转发，巧妙地欺骗了浏览器的检查。可我们都知道，对于即将上线的项目（生产环境），最后都需要 <code>npm run build</code> 构建打包的，而打包出来的资源都是一堆静态资源 html,css,js 文件, 而所谓的代理服务器，其实也就不存在了。<span style="color:yellow">因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。<br></span></p>
-<hr>
-<h2 id="生产模式"><a href="#生产模式" class="headerlink" title="生产模式"></a>生产模式</h2><p>那么如何解决生产模式下的跨域冲突呢？首先，我们必须了解浏览器对跨域请求的两大分类，分别是 简单请求 和 非简单请求。关于简单/非简单请求，可前往阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>
+<p>开发模式下的跨域冲突的解决，实际上只是利用前端框架所自带的代理服务器，进行请求转发，巧妙地欺骗了浏览器的检查。</p>
+<p>可我们都知道，对于即将上线的项目（生产环境），最后都需要 <code>npm run build</code> 构建打包的，而打包出来的资源都是一堆静态资源 html,css,js 文件, 而所谓的代理服务器，其实也就不存在了。</p>
+<p>因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。</p>
+<h2 id="三-生产模式"><a href="#三-生产模式" class="headerlink" title="(三) 生产模式"></a>(三) 生产模式</h2><hr>
+<p>那么如何解决生产模式下的跨域冲突呢？首先，我们必须了解浏览器对跨域请求的两大分类，分别是 简单请求 和 非简单请求。关于简单/非简单请求，可前往阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>
 <p>为了形象说明，我们假设有两个源 ：<code>www.domain-a.com</code> 和 <code>www.domain-b.com</code>。源 a 通过浏览器发送了跨域请求到 源 b 所在的服务器。</p>
-<h3 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a><span style="color:orange">简单请求</span></h3><p>( 1 ) 浏览器默认在请求头上添加 origin 字段，如下：</p>
+<h3 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h3><p>( 1 ) 浏览器默认在请求头上添加 origin 字段，如下：</p>
 <pre><code>origin : https://www.domain-a.com</code></pre>
 <p>( 2 ) 服务器端解析请求头, 获取到上述 <code>origin</code> 字段。得知请求源于 domain-a，判断其是否为可信域。如果可信，则会在响应头 response header 中添加下列字段：</p>
 <pre><code>Access-Control-Allow-Origin: https://www.domain-a.com</code></pre>
@@ -535,8 +534,7 @@ local     my-vol</code></pre>
 <p>服务器端配置 CORS 如下：</p>
 <figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 以 express.js 后端为例</span></span><br><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">"express"</span>);</span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line"><span class="keyword">var</span> trusted_domain = [<span class="string">"https://www.domain-a.com"</span>];</span><br><span class="line"></span><br><span class="line">app.all(<span class="string">'/your-request-url'</span>,<span class="function"><span class="keyword">function</span> (<span class="params">req, res, next</span>) </span>{</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(trusted_domain.includes(req.headers.origin)){</span><br><span class="line">    	res.append(<span class="string">"Access-Control-Allow-Origin"</span>, req.headers.origin);</span><br><span class="line">    	res.send(<span class="string">"CORS 请求成功!"</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">else</span> {</span><br><span class="line">    	res.send(<span class="string">"CORS 请求失败!"</span>);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
-<h3 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a><span style="color:orange">非简单请求</span></h3><p>非简单请求，一般是指有可能对服务器资源进行修改的请求，例如:</p>
+<h3 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h3><p>一般是指有可能对服务器资源进行修改的请求，例如:</p>
 <ul>
 <li><p>content-type 为 application/json 的请求</p>
 </li>
@@ -565,7 +563,8 @@ local     my-vol</code></pre>
 <p>当然，为了对 CORS 有进一步的操作，服务器还可以定义以下字段：</p>
 <p>请求是否携带 COOKIES:<br><code>Access-Control-Allow-Credentials</code></p>
 <p>指定预检请求的有效时长:<br><code>Access-Control-Max-Age</code></p>
-<h2 id="结语："><a href="#结语：" class="headerlink" title="结语："></a>结语：</h2><p>到这里为止，我们已经把简单与非简单的各类型请求的跨域情况做出了分析，并且给出了解决方案。也相信大家对 CORS 已经有了一个比较全面的了解。在日常开发中，我们离不开跨域请求，因此掌握好跨域请求，绝不是一两篇教程就能完成的，还是需要大家多练习，多写写代码，以加深印象。<br>到此为止，本教程已经结束<br>非常感谢大家。</p>
+<h2 id="四-结语："><a href="#四-结语：" class="headerlink" title="(四) 结语："></a>(四) 结语：</h2><hr>
+<p>到这里为止，我们已经把简单与非简单的各类型请求的跨域情况做出了分析，并且给出了解决方案。也相信大家对 CORS 已经有了一个比较全面的了解。在日常开发中，我们离不开跨域请求，因此掌握好跨域请求，绝不是一两篇教程就能完成的，还是需要大家多练习，多写写代码，以加深印象。<br>到此为止，本教程已经结束<br>非常感谢大家。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -598,57 +597,57 @@ local     my-vol</code></pre>
     <title>HTTP缓存Cache机制</title>
     <url>/post/http%E7%BC%93%E5%AD%98cache%E6%9C%BA%E5%88%B6.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过本文，你将会了解什么是 HTTP 缓存，以及它的好处，使用场景和具体用法。</p>
-<h2 id="什么是-HTTP-缓存？"><a href="#什么是-HTTP-缓存？" class="headerlink" title="什么是 HTTP 缓存？"></a>什么是 HTTP 缓存？</h2><p>HTTP 缓存是一种网络资源的短暂储存技术，具体来讲，就是对用户首次 HTTP 访问获取到的静态网络资源进行暂缓储存，等到二次访问时，直接给用户返回资源副本，以避免对相同的资源重复请求和渲染。</p>
-<h2 id="使用缓存的优势"><a href="#使用缓存的优势" class="headerlink" title="使用缓存的优势"></a>使用缓存的优势</h2><p>借由缓存技术，我们避免了对相同网络资源的重复请求和客户端渲染，这不仅大大减轻了服务器因为网络资源请求过载而产生的压力，降低了请求和资源应答在网络传输中的时延，而且用户体验也获得明显的提升。</p>
-<h2 id="HTTP-缓存的种类"><a href="#HTTP-缓存的种类" class="headerlink" title="HTTP 缓存的种类"></a>HTTP 缓存的种类</h2><p>HTTP 缓存在缓存载体上主要划分为: <code>公共缓存</code> 和 <code>本地缓存</code>。<br>公共缓存，主要储存在路由，服务器或者第三方代理上，这一类的缓存是可以被多个用户访问的。<br>本地缓存，主要储存在客户端应用和本地浏览器上，只能被用户本人访问。<br>我们本教程，主要讨论基于浏览器的本地缓存。</p>
-<h2 id="浏览器缓存机制"><a href="#浏览器缓存机制" class="headerlink" title="浏览器缓存机制"></a>浏览器缓存机制</h2><p>浏览器的缓存机制主要有两类：<code>强缓存</code> 以及 <code>协商缓存</code> 。<br><code>强缓存</code> 和 <code>协商缓存</code> 的最大区别在于，用户使用本地缓存前，是否需要获得服务器端的同意。</p>
-<h2 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h2><p>用户请求资源，如果资源已经被浏览器缓存（命中缓存），浏览器直接返回请求资源，返回 200 状态码。这一过程中不需要与服务器端进行交互。如果请求的资源已经缓存过期，浏览器才会重新和服务器发送请求。</p>
-<h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p>用户请求资源，即使命中缓存，浏览器仍然发送缓存文件的版本标识码给服务器。对于被请求的资源文件，服务器会比较浏览器持有和服务器持有的标识码，以确定用户缓存资源是否失效。<br>如果尚未失效，服务端返回 304 状态码，浏览器直接使用缓存资源。如果缓存失效，服务器会重新发送最新版本的文件资源给浏览器，以及 200 状态码。浏览器会把缓存中的旧版资源替换为会最新版本。</p>
-<h2 id="关于缓存的-Header"><a href="#关于缓存的-Header" class="headerlink" title="关于缓存的 Header"></a>关于缓存的 Header</h2><p>(1) Cache-control 定义缓存策略（ HTTP/ 1.1 ）<br>(2) ETags 和 If-None-Match 用于服务器协商缓存<br>(3) Last-Modified 和 If-Modified-Since 用于服务器协商缓存<br>(4) Pragma 和 Expires 定义缓存策略（ HTTP/ 1.0 ）</p>
-<h3 id="一-Cache-control-定义常用缓存策略"><a href="#一-Cache-control-定义常用缓存策略" class="headerlink" title="( 一 ) Cache-control 定义常用缓存策略"></a><span style="color:orange">( 一 ) Cache-control 定义常用缓存策略</span></h3><h4 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h4><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
+<h2 id="一-什么是-HTTP-缓存？"><a href="#一-什么是-HTTP-缓存？" class="headerlink" title="(一) 什么是 HTTP 缓存？"></a>(一) 什么是 HTTP 缓存？</h2><hr>
+<p>HTTP 缓存是一种网络资源的短暂储存技术，具体来讲，就是对用户首次 HTTP 访问获取到的静态网络资源进行暂缓储存，等到二次访问时，直接给用户返回资源副本，以避免对相同的资源重复请求和渲染。</p>
+<h2 id="二-使用缓存的优势"><a href="#二-使用缓存的优势" class="headerlink" title="(二) 使用缓存的优势"></a>(二) 使用缓存的优势</h2><hr>
+<p>借由缓存技术，我们避免了对相同网络资源的重复请求和客户端渲染，这不仅大大减轻了服务器因为网络资源请求过载而产生的压力，降低了请求和资源应答在网络传输中的时延，而且用户体验也获得明显的提升。</p>
+<h2 id="三-HTTP-缓存的种类"><a href="#三-HTTP-缓存的种类" class="headerlink" title="(三) HTTP 缓存的种类"></a>(三) HTTP 缓存的种类</h2><hr>
+<p>HTTP 缓存在缓存载体上主要划分为: <code>公共缓存</code> 和 <code>本地缓存</code>。<br>公共缓存，主要储存在路由，服务器或者第三方代理上，这一类的缓存是可以被多个用户访问的。<br>本地缓存，主要储存在客户端应用和本地浏览器上，只能被用户本人访问。<br>我们本教程，主要讨论基于浏览器的本地缓存。</p>
+<h2 id="四-浏览器缓存机制"><a href="#四-浏览器缓存机制" class="headerlink" title="(四) 浏览器缓存机制"></a>(四) 浏览器缓存机制</h2><hr>
+<p>浏览器的缓存机制主要有两类：<code>强缓存</code> 以及 <code>协商缓存</code> 。<br><code>强缓存</code> 和 <code>协商缓存</code> 的最大区别在于，用户使用本地缓存前，是否需要获得服务器端的同意。</p>
+<h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>用户请求资源，如果资源已经被浏览器缓存（命中缓存），浏览器直接返回请求资源，返回 200 状态码。这一过程中不需要与服务器端进行交互。如果请求的资源已经缓存过期，浏览器才会重新和服务器发送请求。</p>
+<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>用户请求资源，即使命中缓存，浏览器仍然发送缓存文件的版本标识码给服务器。对于被请求的资源文件，服务器会比较浏览器持有和服务器持有的标识码，以确定用户缓存资源是否失效。<br>如果尚未失效，服务端返回 304 状态码，浏览器直接使用缓存资源。如果缓存失效，服务器会重新发送最新版本的文件资源给浏览器，以及 200 状态码。浏览器会把缓存中的旧版资源替换为会最新版本。</p>
+<h2 id="五-关于缓存的-Header"><a href="#五-关于缓存的-Header" class="headerlink" title="(五) 关于缓存的 Header"></a>(五) 关于缓存的 Header</h2><hr>
+<p>(1) Cache-control 定义缓存策略（ HTTP/ 1.1 ）<br>(2) ETags 和 If-None-Match 用于服务器协商缓存<br>(3) Last-Modified 和 If-Modified-Since 用于服务器协商缓存<br>(4) Pragma 和 Expires 定义缓存策略（ HTTP/ 1.0 ）</p>
+<h3 id="Cache-control-定义常用缓存策略"><a href="#Cache-control-定义常用缓存策略" class="headerlink" title="Cache-control 定义常用缓存策略"></a>Cache-control 定义常用缓存策略</h3><h4 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h4><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-store</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="协商验证的缓存"><a href="#协商验证的缓存" class="headerlink" title="协商验证的缓存"></a>协商验证的缓存</h4><p>缓存中保存文件副本，但每次使用缓存前，都需要和服务器进行缓存协商。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-cache</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="存活时长"><a href="#存活时长" class="headerlink" title="存活时长"></a>存活时长</h4><p>指定本地缓存有效使用时长；在有效时间内，浏览器可以直接使用缓存；除非缓存过期，才需要重新向服务器发送请求。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : max-age=3600</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="公共缓存"><a href="#公共缓存" class="headerlink" title="公共缓存"></a>公共缓存</h4><p>允许浏览器和服务器中间的任何中间代理（如 CDN 等）对文件进行缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : public</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h4><p>只允许文件资源缓存在本地浏览器中，不得被其他中间代理缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : private</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="缓存验证"><a href="#缓存验证" class="headerlink" title="缓存验证"></a>缓存验证</h4><p>对陈旧的缓存，需要和服务器验证状态。已过期的缓存不会被使用。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : Must-revalidate</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="二-ETags-和-If-None-Match-用于服务器协商缓存"><a href="#二-ETags-和-If-None-Match-用于服务器协商缓存" class="headerlink" title="( 二 ) ETags 和 If-None-Match 用于服务器协商缓存"></a><span style="color:orange">( 二 ) ETags 和 If-None-Match 用于服务器协商缓存</span></h3><p>(1) 浏览器首次请求资源文件。</p>
+<h3 id="ETags-和-If-None-Match-用于服务器协商缓存"><a href="#ETags-和-If-None-Match-用于服务器协商缓存" class="headerlink" title="ETags 和 If-None-Match 用于服务器协商缓存"></a>ETags 和 If-None-Match 用于服务器协商缓存</h3><p>(1) 浏览器首次请求资源文件。</p>
 <p>(2) 服务器基于被请求的文件，生成文件标识 token, 并在响应头使用 ETags 字段传递 token。</p>
 <p>例如：<code>ETags：9qL13hsya#c</code></p>
 <p>(3) 当浏览器再次和服务器请求同一文件时候，客户端自动在请求头加上“If-None-Match” 字段，值为 &lt; ETag token &gt;。</p>
 <p>例如：<code>If-None-Match：9qL13hsya#c</code></p>
 <p>(4) 服务器根据当前资源核对 token。 如果 token 未发生变化，服务器将返回“304 Not Modified”响应以及一个空的响应体，浏览器直接使用本地缓存文件。如果已经发生变化，服务器会返回新的文件资源，响应码为 200。</p>
-<h3 id="三-Last-Modified-和-If-Modified-Since-用于服务器协商缓存"><a href="#三-Last-Modified-和-If-Modified-Since-用于服务器协商缓存" class="headerlink" title="( 三 ) Last-Modified 和 If-Modified-Since 用于服务器协商缓存"></a><span style="color:orange">( 三 ) Last-Modified 和 If-Modified-Since 用于服务器协商缓存</span></h3><p>(1) 浏览器首次请求资源文件。</p>
+<h3 id="Last-Modified-和-If-Modified-Since-用于服务器协商缓存"><a href="#Last-Modified-和-If-Modified-Since-用于服务器协商缓存" class="headerlink" title="Last-Modified 和 If-Modified-Since 用于服务器协商缓存"></a>Last-Modified 和 If-Modified-Since 用于服务器协商缓存</h3><p>(1) 浏览器首次请求资源文件。</p>
 <p>(2) 服务器返回文件以及响应头添加文件最后的修改时间 Last-Modified 。</p>
 <p>例如：<code>last-modified: Thu, 13 Aug 2020 22:43:16 GMT</code></p>
 <p>(3) 浏览器获取文件后，将文件以及 Last-Modified 时间戳进行缓存。</p>
 <p>(4) 当浏览器再次和服务器请求同一文件时候，客户端自动在请求头加上“Last-Modified-Since” 字段，值为 Last-Modified 时间值。</p>
 <p>例如：<code>last-modified-Since: Thu, 13 Aug 2020 22:43:16 GMT</code></p>
 <p>(5) 服务器比对修改时间。 如果 Last-Midified 时间未发生变化，服务器将返回“304 Not Modified”响应以及一个空的响应体，浏览器直接使用本地缓存文件。如果已经发生变化，服务器会返回新的文件资源，响应码为 200。</p>
-<h3 id="四-ETags-和-Last-Modifed-的对比："><a href="#四-ETags-和-Last-Modifed-的对比：" class="headerlink" title="( 四 ) ETags 和 Last-Modifed 的对比："></a><span style="color:orange">( 四 ) ETags 和 Last-Modifed 的对比：</span></h3><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
+<h3 id="ETags-和-Last-Modifed-的对比："><a href="#ETags-和-Last-Modifed-的对比：" class="headerlink" title="ETags 和 Last-Modifed 的对比："></a>ETags 和 Last-Modifed 的对比：</h3><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
 <p>在效率上来讲，ETags 对服务器端的开销要高于 Last-Modified，因为对于每次新的请求，服务器端都需要额外生成 ETag token 值，与浏览器缓存发来的 token 进行比较。</p>
 <p>下图为缓存策略判定：</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597837271/tech_blog/http%20cache/cache_strategy_tree.jpg"></p>
 <p>（Image Src ：reference[1] )</p>
-<h3 id="五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a><span style="color:orange">( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</span></h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
+<h3 id="Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a>Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
 <h4 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h4><p>HTTP/1.0 标准中，其值为一个 GMT 时间（精确到秒）。用来定义资源在缓存中的有效时长。但由于返回的是服务器端的时间，如果客户端时区不一致，可能会导致缓存策略失败。缓存在有效日期前会直接返回用户；资源过期后需要重新向服务器端请求资源。如果 Pragma 和 Expires 同时存在，Pragma 优先级最高。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
+<h2 id="六-Reference"><a href="#六-Reference" class="headerlink" title="(六) Reference"></a>(六) Reference</h2><p><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
 <p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ</a> [2]</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -684,15 +683,18 @@ local     my-vol</code></pre>
 <blockquote>
 <p>下一篇教程, 将讨论 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html" title="网页开发之跨域请求CORS的实现(下篇)">网页开发之跨域请求CORS的实现(下篇)</a> 。</p>
 </blockquote>
-<h2 id="一-什么是跨域请求？"><a href="#一-什么是跨域请求？" class="headerlink" title="( 一 ) 什么是跨域请求？"></a>( 一 ) 什么是跨域请求？</h2><p>当一个源希望与另一个源的服务器资源进行交互时，前者会发送一系列的 HTTP 请求（GET,POST,DELETE,UPDATE 等）给后者，我们把这类型的请求视为跨域请求。具体来讲，只要两个站点所使用的<code>域名</code>，<code>协议</code>，<code>端口</code>任意一个不相等，我们把它们之间的 http 请求视为跨域。例如，我们通过浏览器打开 <code>http://127.0.0.1:8080</code> 的页面，浏览器是不允许该页面下发送跨域的 ajax 请求，以获取 <code>http://127.0.0.1:8081</code> 服务器下的资源 。</p>
-<h2 id="二-跨域示例"><a href="#二-跨域示例" class="headerlink" title="( 二 ) 跨域示例"></a>( 二 ) 跨域示例</h2><p>不同域名：<code>www.google.com</code> 和 <code>www.baidu.com</code><br>不同协议：<code>http</code> 和 <code>https</code><br>不同端口：<code>8080</code> 和 <code>8081</code></p>
-<h2 id="三-浏览器跨域警告"><a href="#三-浏览器跨域警告" class="headerlink" title="( 三 ) 浏览器跨域警告"></a>( 三 ) 浏览器跨域警告</h2><p>相信很多前端开发的朋友都碰到过以下的警告信息：</p>
+<h2 id="一-什么是跨域请求？"><a href="#一-什么是跨域请求？" class="headerlink" title="(一) 什么是跨域请求？"></a>(一) 什么是跨域请求？</h2><hr>
+<p>当一个源希望与另一个源的服务器资源进行交互时，前者会发送一系列的 HTTP 请求（GET,POST,DELETE,UPDATE 等）给后者，我们把这类型的请求视为跨域请求。具体来讲，只要两个站点所使用的<code>域名</code>，<code>协议</code>，<code>端口</code>任意一个不相等，我们把它们之间的 http 请求视为跨域。例如，我们通过浏览器打开 <code>http://127.0.0.1:8080</code> 的页面，浏览器是不允许该页面下发送跨域的 ajax 请求，以获取 <code>http://127.0.0.1:8081</code> 服务器下的资源 。</p>
+<h2 id="二-跨域示例"><a href="#二-跨域示例" class="headerlink" title="(二) 跨域示例"></a>(二) 跨域示例</h2><hr>
+<p>不同域名：<code>www.google.com</code> 和 <code>www.baidu.com</code><br>不同协议：<code>http</code> 和 <code>https</code><br>不同端口：<code>8080</code> 和 <code>8081</code></p>
+<h2 id="三-浏览器跨域警告"><a href="#三-浏览器跨域警告" class="headerlink" title="(三) 浏览器跨域警告"></a>(三) 浏览器跨域警告</h2><hr>
+<p>相信很多前端开发的朋友都碰到过以下的警告信息：</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597579606/tech_blog/cors/step8.jpg"></p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597579606/tech_blog/cors/step6.jpg"></p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597579606/tech_blog/cors/step7.jpg"></p>
 <p>这是因为在默认情况下，客户端（浏览器）会禁止客户端所有非法的跨域请求。<br>但有一种例外，网页上通过 <code>img</code>, <code>link</code>, <code>script</code> 等外链标签获取到的外部资源，也是跨域请求。浏览器默认这一类跨域请求是可信的，并不会禁止。过去，许多开发者则是基于外链标签可跨域的原理，使用 <code>JSONP</code> 发送跨域请求的。</p>
-<hr>
-<h2 id="四-为什么禁止非法的跨域请求？"><a href="#四-为什么禁止非法的跨域请求？" class="headerlink" title="( 四 ) 为什么禁止非法的跨域请求？"></a>( 四 ) 为什么禁止非法的跨域请求？</h2><p>我们可以想象一个网上银行存取款的场景。</p>
+<h2 id="四-为什么禁止非法的跨域请求？"><a href="#四-为什么禁止非法的跨域请求？" class="headerlink" title="(四) 为什么禁止非法的跨域请求？"></a>(四) 为什么禁止非法的跨域请求？</h2><hr>
+<p>我们可以想象一个网上银行存取款的场景。</p>
 <p><code>www.yin-hang.com（可信站点）</code></p>
 <p><code>www.yin-han.com（恶意站点）</code></p>
 <p>小明每月都定期往在他的网银账户存入 5000 元的工资。</p>
@@ -702,8 +704,8 @@ local     my-vol</code></pre>
 <blockquote>
 <p><span class="github-emoji" style="font-size:1em;font-weight:bold;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/26a0.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png?v8">⚠</span> 因此，大多数浏览器出于对用户安全的角度考虑，都会禁止所有非法的跨域请求。</p>
 </blockquote>
-<hr>
-<h2 id="五-跨域请求的具体类型"><a href="#五-跨域请求的具体类型" class="headerlink" title="( 五 ) 跨域请求的具体类型"></a>( 五 ) 跨域请求的具体类型</h2><p>浏览器将跨域请求（CORS）分为简单请求（simple request） 以及 非简单请求(non-simple request)。</p>
+<h2 id="五-跨域请求的具体类型"><a href="#五-跨域请求的具体类型" class="headerlink" title="(五) 跨域请求的具体类型"></a>(五) 跨域请求的具体类型</h2><hr>
+<p>浏览器将跨域请求（CORS）分为简单请求（simple request） 以及 非简单请求(non-simple request)。</p>
 <h3 id="简单请求："><a href="#简单请求：" class="headerlink" title="简单请求："></a>简单请求：</h3><p>( 1 ) 请求方法为 <code>GET</code>，<code>HEAD</code>， <code>POST</code>任意一种</p>
 <p>( 2 ) HTTP 头信息只包含以下字段：</p>
 <ul>
@@ -720,7 +722,6 @@ local     my-vol</code></pre>
 <p>其中 Content-type 只能是 application/x-www-form-urlencoded、multipart/form-data、text/plain 其中之一。</p>
 <figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 简单请求的例子</span></span><br><span class="line"><span class="comment">// 当前页面 http://127.0.0.1:8080/index.html</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HTTP_CONFIG = { <span class="attr">method</span>: <span class="string">"GET"</span> };</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过 Fetch 给 http://127.0.0.1:8081/" 发送跨域请求，方法 GET</span></span><br><span class="line">fetch(<span class="string">"http://127.0.0.1:8081/"</span>, HTTP_CONFIG)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>{</span><br><span class="line"><span class="keyword">return</span> response.json();</span><br><span class="line">})</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>{</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Response from SERVER_2 : "</span>, res);</span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h3 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求:"></a>非简单请求:</h3><p>( 1 ) content-type : application/json 的请求</p>
 <figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 非简单请求的例子</span></span><br><span class="line"><span class="comment">// 当前页面 http://127.0.0.1:8080/index.html</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HTTP_CONFIG = {</span><br><span class="line">method: <span class="string">"POST"</span>,</span><br><span class="line">headers: {</span><br><span class="line"><span class="string">"content-type"</span>: <span class="string">"application/json"</span>,</span><br><span class="line">}</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过 Fetch 给 http://127.0.0.1:8081/" 发送跨域请求</span></span><br><span class="line">fetch(<span class="string">"http://127.0.0.1:8081/"</span>, HTTP_CONFIG)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>{</span><br><span class="line"><span class="keyword">return</span> response.json();</span><br><span class="line">})</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>{</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Response from SERVER_2 : "</span>, res);</span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
@@ -730,8 +731,8 @@ local     my-vol</code></pre>
 <p>( 3 ) 自定义的 HTTP Header 的请求</p>
 <figure class="highlight js"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 非简单请求的例子</span></span><br><span class="line"><span class="comment">// 当前页面 http://127.0.0.1:8080/index.html</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HTTP_CONFIG = {</span><br><span class="line">method: <span class="string">"POST"</span>,</span><br><span class="line">headers: {</span><br><span class="line"><span class="comment">//自定义 header : "x-custom-header"</span></span><br><span class="line"><span class="string">"x-custom-header"</span>: <span class="string">"my-header"</span>,</span><br><span class="line">}</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过 Fetch 给 http://127.0.0.1:8081/" 发送跨域请求</span></span><br><span class="line">fetch(<span class="string">"http://127.0.0.1:8081/"</span>, HTTP_CONFIG)</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>{</span><br><span class="line"><span class="keyword">return</span> response.json();</span><br><span class="line">})</span><br><span class="line">.then(<span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>{</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Response from SERVER_2 : "</span>, res);</span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
-<h2 id="六-结语"><a href="#六-结语" class="headerlink" title="( 六 ) 结语"></a>( 六 ) 结语</h2><p>到此，我们已经知道浏览器面对跨域请求时候，会划分成<code>简单</code>和<code>非简单</code>两种类型。可正如上文所讲，浏览器为了保护用户安全，默认禁止非法的跨域请求，以及抛出典型的“跨域冲突”警告。那如果我们告诉浏览器，它处理的是一个合法的跨域请求呢？跨域冲突的问题不就解决了吗？！</p>
+<h2 id="六-结语"><a href="#六-结语" class="headerlink" title="(六) 结语"></a>(六) 结语</h2><hr>
+<p>到此，我们已经知道浏览器面对跨域请求时候，会划分成<code>简单</code>和<code>非简单</code>两种类型。可正如上文所讲，浏览器为了保护用户安全，默认禁止非法的跨域请求，以及抛出典型的“跨域冲突”警告。那如果我们告诉浏览器，它处理的是一个合法的跨域请求呢？跨域冲突的问题不就解决了吗？！</p>
 <blockquote>
 <p>我们将在接下来的文章 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html" title="网页开发之跨域请求CORS的实现(下篇)">网页开发之跨域请求CORS的实现(下篇)</a> 进一步讨论。</p>
 </blockquote>

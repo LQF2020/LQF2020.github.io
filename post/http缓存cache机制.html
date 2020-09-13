@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1597837271/tech_blog/http%20cache/cache_strategy_tree.jpg">
 <meta property="article:published_time" content="2020-08-19T11:30:38.000Z">
-<meta property="article:modified_time" content="2020-08-20T11:47:17.732Z">
+<meta property="article:modified_time" content="2020-09-13T06:18:37.272Z">
 <meta property="article:author" content="Qifu Lu">
 <meta property="article:tag" content="HTTP">
 <meta property="article:tag" content="Cache">
@@ -210,7 +210,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
-          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-HTTP-%E7%BC%93%E5%AD%98%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什么是 HTTP 缓存？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">3.</span> <span class="nav-text">使用缓存的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E7%BC%93%E5%AD%98%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">HTTP 缓存的种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6"><span class="nav-number">5.</span> <span class="nav-text">浏览器缓存机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E7%BC%93%E5%AD%98"><span class="nav-number">6.</span> <span class="nav-text">强缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">7.</span> <span class="nav-text">协商缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E7%9A%84-Header"><span class="nav-number">8.</span> <span class="nav-text">关于缓存的 Header</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-Cache-control-%E5%AE%9A%E4%B9%89%E5%B8%B8%E7%94%A8%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5"><span class="nav-number">8.1.</span> <span class="nav-text">( 一 ) Cache-control 定义常用缓存策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E7%BC%93%E5%AD%98"><span class="nav-number">8.1.1.</span> <span class="nav-text">禁用缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8F%E5%95%86%E9%AA%8C%E8%AF%81%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">8.1.2.</span> <span class="nav-text">协商验证的缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E6%B4%BB%E6%97%B6%E9%95%BF"><span class="nav-number">8.1.3.</span> <span class="nav-text">存活时长</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AC%E5%85%B1%E7%BC%93%E5%AD%98"><span class="nav-number">8.1.4.</span> <span class="nav-text">公共缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"><span class="nav-number">8.1.5.</span> <span class="nav-text">本地缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%AA%8C%E8%AF%81"><span class="nav-number">8.1.6.</span> <span class="nav-text">缓存验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-ETags-%E5%92%8C-If-None-Match-%E7%94%A8%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">8.2.</span> <span class="nav-text">( 二 ) ETags 和 If-None-Match 用于服务器协商缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89-Last-Modified-%E5%92%8C-If-Modified-Since-%E7%94%A8%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">8.3.</span> <span class="nav-text">( 三 ) Last-Modified 和 If-Modified-Since 用于服务器协商缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B-ETags-%E5%92%8C-Last-Modifed-%E7%9A%84%E5%AF%B9%E6%AF%94%EF%BC%9A"><span class="nav-number">8.4.</span> <span class="nav-text">( 四 ) ETags 和 Last-Modifed 的对比：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94-Pragma-%E5%92%8C-Expires-%E5%AE%9A%E4%B9%89%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5-%EF%BC%88-HTTP-1-0-%EF%BC%89"><span class="nav-number">8.5.</span> <span class="nav-text">( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP&#x2F; 1.0 ）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Pragma"><span class="nav-number">8.5.1.</span> <span class="nav-text">Pragma</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Expires"><span class="nav-number">8.5.2.</span> <span class="nav-text">Expires</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E4%BB%80%E4%B9%88%E6%98%AF-HTTP-%E7%BC%93%E5%AD%98%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">(一) 什么是 HTTP 缓存？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">3.</span> <span class="nav-text">(二) 使用缓存的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-HTTP-%E7%BC%93%E5%AD%98%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">(三) HTTP 缓存的种类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6"><span class="nav-number">5.</span> <span class="nav-text">(四) 浏览器缓存机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%BA%E7%BC%93%E5%AD%98"><span class="nav-number">5.1.</span> <span class="nav-text">强缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">5.2.</span> <span class="nav-text">协商缓存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94-%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E7%9A%84-Header"><span class="nav-number">6.</span> <span class="nav-text">(五) 关于缓存的 Header</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-control-%E5%AE%9A%E4%B9%89%E5%B8%B8%E7%94%A8%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5"><span class="nav-number">6.1.</span> <span class="nav-text">Cache-control 定义常用缓存策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E7%BC%93%E5%AD%98"><span class="nav-number">6.1.1.</span> <span class="nav-text">禁用缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8F%E5%95%86%E9%AA%8C%E8%AF%81%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">6.1.2.</span> <span class="nav-text">协商验证的缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E6%B4%BB%E6%97%B6%E9%95%BF"><span class="nav-number">6.1.3.</span> <span class="nav-text">存活时长</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%AC%E5%85%B1%E7%BC%93%E5%AD%98"><span class="nav-number">6.1.4.</span> <span class="nav-text">公共缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"><span class="nav-number">6.1.5.</span> <span class="nav-text">本地缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%AA%8C%E8%AF%81"><span class="nav-number">6.1.6.</span> <span class="nav-text">缓存验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ETags-%E5%92%8C-If-None-Match-%E7%94%A8%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">6.2.</span> <span class="nav-text">ETags 和 If-None-Match 用于服务器协商缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Last-Modified-%E5%92%8C-If-Modified-Since-%E7%94%A8%E4%BA%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98"><span class="nav-number">6.3.</span> <span class="nav-text">Last-Modified 和 If-Modified-Since 用于服务器协商缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ETags-%E5%92%8C-Last-Modifed-%E7%9A%84%E5%AF%B9%E6%AF%94%EF%BC%9A"><span class="nav-number">6.4.</span> <span class="nav-text">ETags 和 Last-Modifed 的对比：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pragma-%E5%92%8C-Expires-%E5%AE%9A%E4%B9%89%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5-%EF%BC%88-HTTP-1-0-%EF%BC%89"><span class="nav-number">6.5.</span> <span class="nav-text">Pragma 和 Expires 定义缓存策略 （ HTTP&#x2F; 1.0 ）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Pragma"><span class="nav-number">6.5.1.</span> <span class="nav-text">Pragma</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Expires"><span class="nav-number">6.5.2.</span> <span class="nav-text">Expires</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD-Reference"><span class="nav-number">7.</span> <span class="nav-text">(六) Reference</span></a></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -224,7 +224,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12.1k</span>
+    <span title="站点总字数">字数共计：12k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
@@ -345,7 +345,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-20 21:47:17" itemprop="dateModified" datetime="2020-08-20T21:47:17+10:00">2020-08-20</time>
+                <time title="修改时间：2020-09-13 16:18:37" itemprop="dateModified" datetime="2020-09-13T16:18:37+10:00">2020-09-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -387,57 +387,57 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>通过本文，你将会了解什么是 HTTP 缓存，以及它的好处，使用场景和具体用法。</p>
-<h2 id="什么是-HTTP-缓存？"><a href="#什么是-HTTP-缓存？" class="headerlink" title="什么是 HTTP 缓存？"></a>什么是 HTTP 缓存？</h2><p>HTTP 缓存是一种网络资源的短暂储存技术，具体来讲，就是对用户首次 HTTP 访问获取到的静态网络资源进行暂缓储存，等到二次访问时，直接给用户返回资源副本，以避免对相同的资源重复请求和渲染。</p>
-<h2 id="使用缓存的优势"><a href="#使用缓存的优势" class="headerlink" title="使用缓存的优势"></a>使用缓存的优势</h2><p>借由缓存技术，我们避免了对相同网络资源的重复请求和客户端渲染，这不仅大大减轻了服务器因为网络资源请求过载而产生的压力，降低了请求和资源应答在网络传输中的时延，而且用户体验也获得明显的提升。</p>
-<h2 id="HTTP-缓存的种类"><a href="#HTTP-缓存的种类" class="headerlink" title="HTTP 缓存的种类"></a>HTTP 缓存的种类</h2><p>HTTP 缓存在缓存载体上主要划分为: <code>公共缓存</code> 和 <code>本地缓存</code>。<br>公共缓存，主要储存在路由，服务器或者第三方代理上，这一类的缓存是可以被多个用户访问的。<br>本地缓存，主要储存在客户端应用和本地浏览器上，只能被用户本人访问。<br>我们本教程，主要讨论基于浏览器的本地缓存。</p>
-<h2 id="浏览器缓存机制"><a href="#浏览器缓存机制" class="headerlink" title="浏览器缓存机制"></a>浏览器缓存机制</h2><p>浏览器的缓存机制主要有两类：<code>强缓存</code> 以及 <code>协商缓存</code> 。<br><code>强缓存</code> 和 <code>协商缓存</code> 的最大区别在于，用户使用本地缓存前，是否需要获得服务器端的同意。</p>
-<h2 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h2><p>用户请求资源，如果资源已经被浏览器缓存（命中缓存），浏览器直接返回请求资源，返回 200 状态码。这一过程中不需要与服务器端进行交互。如果请求的资源已经缓存过期，浏览器才会重新和服务器发送请求。</p>
-<h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p>用户请求资源，即使命中缓存，浏览器仍然发送缓存文件的版本标识码给服务器。对于被请求的资源文件，服务器会比较浏览器持有和服务器持有的标识码，以确定用户缓存资源是否失效。<br>如果尚未失效，服务端返回 304 状态码，浏览器直接使用缓存资源。如果缓存失效，服务器会重新发送最新版本的文件资源给浏览器，以及 200 状态码。浏览器会把缓存中的旧版资源替换为会最新版本。</p>
-<h2 id="关于缓存的-Header"><a href="#关于缓存的-Header" class="headerlink" title="关于缓存的 Header"></a>关于缓存的 Header</h2><p>(1) Cache-control 定义缓存策略（ HTTP/ 1.1 ）<br>(2) ETags 和 If-None-Match 用于服务器协商缓存<br>(3) Last-Modified 和 If-Modified-Since 用于服务器协商缓存<br>(4) Pragma 和 Expires 定义缓存策略（ HTTP/ 1.0 ）</p>
-<h3 id="一-Cache-control-定义常用缓存策略"><a href="#一-Cache-control-定义常用缓存策略" class="headerlink" title="( 一 ) Cache-control 定义常用缓存策略"></a><span style="color:orange">( 一 ) Cache-control 定义常用缓存策略</span></h3><h4 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h4><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
+<h2 id="一-什么是-HTTP-缓存？"><a href="#一-什么是-HTTP-缓存？" class="headerlink" title="(一) 什么是 HTTP 缓存？"></a>(一) 什么是 HTTP 缓存？</h2><hr>
+<p>HTTP 缓存是一种网络资源的短暂储存技术，具体来讲，就是对用户首次 HTTP 访问获取到的静态网络资源进行暂缓储存，等到二次访问时，直接给用户返回资源副本，以避免对相同的资源重复请求和渲染。</p>
+<h2 id="二-使用缓存的优势"><a href="#二-使用缓存的优势" class="headerlink" title="(二) 使用缓存的优势"></a>(二) 使用缓存的优势</h2><hr>
+<p>借由缓存技术，我们避免了对相同网络资源的重复请求和客户端渲染，这不仅大大减轻了服务器因为网络资源请求过载而产生的压力，降低了请求和资源应答在网络传输中的时延，而且用户体验也获得明显的提升。</p>
+<h2 id="三-HTTP-缓存的种类"><a href="#三-HTTP-缓存的种类" class="headerlink" title="(三) HTTP 缓存的种类"></a>(三) HTTP 缓存的种类</h2><hr>
+<p>HTTP 缓存在缓存载体上主要划分为: <code>公共缓存</code> 和 <code>本地缓存</code>。<br>公共缓存，主要储存在路由，服务器或者第三方代理上，这一类的缓存是可以被多个用户访问的。<br>本地缓存，主要储存在客户端应用和本地浏览器上，只能被用户本人访问。<br>我们本教程，主要讨论基于浏览器的本地缓存。</p>
+<h2 id="四-浏览器缓存机制"><a href="#四-浏览器缓存机制" class="headerlink" title="(四) 浏览器缓存机制"></a>(四) 浏览器缓存机制</h2><hr>
+<p>浏览器的缓存机制主要有两类：<code>强缓存</code> 以及 <code>协商缓存</code> 。<br><code>强缓存</code> 和 <code>协商缓存</code> 的最大区别在于，用户使用本地缓存前，是否需要获得服务器端的同意。</p>
+<h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>用户请求资源，如果资源已经被浏览器缓存（命中缓存），浏览器直接返回请求资源，返回 200 状态码。这一过程中不需要与服务器端进行交互。如果请求的资源已经缓存过期，浏览器才会重新和服务器发送请求。</p>
+<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>用户请求资源，即使命中缓存，浏览器仍然发送缓存文件的版本标识码给服务器。对于被请求的资源文件，服务器会比较浏览器持有和服务器持有的标识码，以确定用户缓存资源是否失效。<br>如果尚未失效，服务端返回 304 状态码，浏览器直接使用缓存资源。如果缓存失效，服务器会重新发送最新版本的文件资源给浏览器，以及 200 状态码。浏览器会把缓存中的旧版资源替换为会最新版本。</p>
+<h2 id="五-关于缓存的-Header"><a href="#五-关于缓存的-Header" class="headerlink" title="(五) 关于缓存的 Header"></a>(五) 关于缓存的 Header</h2><hr>
+<p>(1) Cache-control 定义缓存策略（ HTTP/ 1.1 ）<br>(2) ETags 和 If-None-Match 用于服务器协商缓存<br>(3) Last-Modified 和 If-Modified-Since 用于服务器协商缓存<br>(4) Pragma 和 Expires 定义缓存策略（ HTTP/ 1.0 ）</p>
+<h3 id="Cache-control-定义常用缓存策略"><a href="#Cache-control-定义常用缓存策略" class="headerlink" title="Cache-control 定义常用缓存策略"></a>Cache-control 定义常用缓存策略</h3><h4 id="禁用缓存"><a href="#禁用缓存" class="headerlink" title="禁用缓存"></a>禁用缓存</h4><p>缓存不得储存任何的文件副本。每一次都需要重新向服务器发送请求获取资源。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-store</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="协商验证的缓存"><a href="#协商验证的缓存" class="headerlink" title="协商验证的缓存"></a>协商验证的缓存</h4><p>缓存中保存文件副本，但每次使用缓存前，都需要和服务器进行缓存协商。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : no-cache</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="存活时长"><a href="#存活时长" class="headerlink" title="存活时长"></a>存活时长</h4><p>指定本地缓存有效使用时长；在有效时间内，浏览器可以直接使用缓存；除非缓存过期，才需要重新向服务器发送请求。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : max-age=3600</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="公共缓存"><a href="#公共缓存" class="headerlink" title="公共缓存"></a>公共缓存</h4><p>允许浏览器和服务器中间的任何中间代理（如 CDN 等）对文件进行缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : public</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h4><p>只允许文件资源缓存在本地浏览器中，不得被其他中间代理缓存。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : private</span><br></pre></td></tr></tbody></table></figure>
 
-<hr>
 <h4 id="缓存验证"><a href="#缓存验证" class="headerlink" title="缓存验证"></a>缓存验证</h4><p>对陈旧的缓存，需要和服务器验证状态。已过期的缓存不会被使用。</p>
 <figure class="highlight plain"><table><tbody><tr><td class="code"><pre><span class="line">Cache-control : Must-revalidate</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="二-ETags-和-If-None-Match-用于服务器协商缓存"><a href="#二-ETags-和-If-None-Match-用于服务器协商缓存" class="headerlink" title="( 二 ) ETags 和 If-None-Match 用于服务器协商缓存"></a><span style="color:orange">( 二 ) ETags 和 If-None-Match 用于服务器协商缓存</span></h3><p>(1) 浏览器首次请求资源文件。</p>
+<h3 id="ETags-和-If-None-Match-用于服务器协商缓存"><a href="#ETags-和-If-None-Match-用于服务器协商缓存" class="headerlink" title="ETags 和 If-None-Match 用于服务器协商缓存"></a>ETags 和 If-None-Match 用于服务器协商缓存</h3><p>(1) 浏览器首次请求资源文件。</p>
 <p>(2) 服务器基于被请求的文件，生成文件标识 token, 并在响应头使用 ETags 字段传递 token。</p>
 <p>例如：<code>ETags：9qL13hsya#c</code></p>
 <p>(3) 当浏览器再次和服务器请求同一文件时候，客户端自动在请求头加上“If-None-Match” 字段，值为 &lt; ETag token &gt;。</p>
 <p>例如：<code>If-None-Match：9qL13hsya#c</code></p>
 <p>(4) 服务器根据当前资源核对 token。 如果 token 未发生变化，服务器将返回“304 Not Modified”响应以及一个空的响应体，浏览器直接使用本地缓存文件。如果已经发生变化，服务器会返回新的文件资源，响应码为 200。</p>
-<h3 id="三-Last-Modified-和-If-Modified-Since-用于服务器协商缓存"><a href="#三-Last-Modified-和-If-Modified-Since-用于服务器协商缓存" class="headerlink" title="( 三 ) Last-Modified 和 If-Modified-Since 用于服务器协商缓存"></a><span style="color:orange">( 三 ) Last-Modified 和 If-Modified-Since 用于服务器协商缓存</span></h3><p>(1) 浏览器首次请求资源文件。</p>
+<h3 id="Last-Modified-和-If-Modified-Since-用于服务器协商缓存"><a href="#Last-Modified-和-If-Modified-Since-用于服务器协商缓存" class="headerlink" title="Last-Modified 和 If-Modified-Since 用于服务器协商缓存"></a>Last-Modified 和 If-Modified-Since 用于服务器协商缓存</h3><p>(1) 浏览器首次请求资源文件。</p>
 <p>(2) 服务器返回文件以及响应头添加文件最后的修改时间 Last-Modified 。</p>
 <p>例如：<code>last-modified: Thu, 13 Aug 2020 22:43:16 GMT</code></p>
 <p>(3) 浏览器获取文件后，将文件以及 Last-Modified 时间戳进行缓存。</p>
 <p>(4) 当浏览器再次和服务器请求同一文件时候，客户端自动在请求头加上“Last-Modified-Since” 字段，值为 Last-Modified 时间值。</p>
 <p>例如：<code>last-modified-Since: Thu, 13 Aug 2020 22:43:16 GMT</code></p>
 <p>(5) 服务器比对修改时间。 如果 Last-Midified 时间未发生变化，服务器将返回“304 Not Modified”响应以及一个空的响应体，浏览器直接使用本地缓存文件。如果已经发生变化，服务器会返回新的文件资源，响应码为 200。</p>
-<h3 id="四-ETags-和-Last-Modifed-的对比："><a href="#四-ETags-和-Last-Modifed-的对比：" class="headerlink" title="( 四 ) ETags 和 Last-Modifed 的对比："></a><span style="color:orange">( 四 ) ETags 和 Last-Modifed 的对比：</span></h3><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
+<h3 id="ETags-和-Last-Modifed-的对比："><a href="#ETags-和-Last-Modifed-的对比：" class="headerlink" title="ETags 和 Last-Modifed 的对比："></a>ETags 和 Last-Modifed 的对比：</h3><p>Etags 更能保证文件的准确性。Last-Modified 只能精确到以秒为单位的时间戳，但一秒以内发生的变化是无法捕捉的。Etag token 则是根据文件内容，借由 hash 算法得出的唯一标识，可以捕获文件的每次改变，因此，ETags 算是对 last-Modified 的补充。</p>
 <p>在效率上来讲，ETags 对服务器端的开销要高于 Last-Modified，因为对于每次新的请求，服务器端都需要额外生成 ETag token 值，与浏览器缓存发来的 token 进行比较。</p>
 <p>下图为缓存策略判定：</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597837271/tech_blog/http%20cache/cache_strategy_tree.jpg"></p>
 <p>（Image Src ：reference[1] )</p>
-<h3 id="五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#五-Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a><span style="color:orange">( 五 ) Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</span></h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
+<h3 id="Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）"><a href="#Pragma-和-Expires-定义缓存策略-（-HTTP-1-0-）" class="headerlink" title="Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）"></a>Pragma 和 Expires 定义缓存策略 （ HTTP/ 1.0 ）</h3><h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p>HTTP/1.0 标准中，一般赋值为 no-cache，效果上和 Cache-control：no-cache 一样。表示禁止浏览器缓存，每次都要向服务器发送新请求。这是以前老式浏览器的标准，但为了 http 协议向下兼容，至今持续使用。如果 Pragma 和 Cache-control 同时存在，浏览器会执行 Pragma 缓存策略。这说明，Pragma 优先级高于 Cache-control。</p>
 <h4 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h4><p>HTTP/1.0 标准中，其值为一个 GMT 时间（精确到秒）。用来定义资源在缓存中的有效时长。但由于返回的是服务器端的时间，如果客户端时区不一致，可能会导致缓存策略失败。缓存在有效日期前会直接返回用户；资源过期后需要重新向服务器端请求资源。如果 Pragma 和 Expires 同时存在，Pragma 优先级最高。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
+<h2 id="六-Reference"><a href="#六-Reference" class="headerlink" title="(六) Reference"></a>(六) Reference</h2><p><a target="_blank" rel="noopener" href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-cn</a> [1]</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ</a> [2]</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -575,7 +575,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12.1k</span>
+    <span title="站点总字数">字数共计：12k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>

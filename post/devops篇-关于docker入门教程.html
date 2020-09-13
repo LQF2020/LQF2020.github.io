@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg">
 <meta property="article:published_time" content="2020-09-12T08:02:38.000Z">
-<meta property="article:modified_time" content="2020-09-13T03:08:54.093Z">
+<meta property="article:modified_time" content="2020-09-13T06:00:24.048Z">
 <meta property="article:author" content="Qifu Lu">
 <meta property="article:tag" content="DevOps">
 <meta property="article:tag" content="CI&#x2F;CD">
@@ -211,7 +211,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
-          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E4%BB%80%E4%B9%88%E6%98%AF-Docker%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">( 一 ) 什么是 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-Docker%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">( 二 ) 为什么需要 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-Docker-%E5%92%8C%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-number">4.</span> <span class="nav-text">( 三 ) Docker 和虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E5%AE%89%E8%A3%85-Docker"><span class="nav-number">5.</span> <span class="nav-text">( 四 ) 安装 Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94-Docker-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="nav-number">6.</span> <span class="nav-text">( 五 ) Docker 基本知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD-Docker-%E4%BB%93%E5%BA%93-Dockerhub"><span class="nav-number">7.</span> <span class="nav-text">( 六 ) Docker 仓库 Dockerhub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83-Docker-%E9%95%9C%E5%83%8F%E6%8C%87%E4%BB%A4"><span class="nav-number">8.</span> <span class="nav-text">( 七 ) Docker 镜像指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB-Docker-%E5%AE%B9%E5%99%A8-Container"><span class="nav-number">9.</span> <span class="nav-text">( 八 ) Docker 容器 Container</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-ubuntu-%E4%B8%BA%E4%BE%8B%EF%BC%8C%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%90%AF%E4%BA%A4%E4%BA%92%E4%BC%AA%E7%BB%88%E7%AB%AF"><span class="nav-number">9.1.</span> <span class="nav-text">以 ubuntu 为例，本地开启交互伪终端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-mysql-%E4%B8%BA%E4%BE%8B-p-%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84"><span class="nav-number">9.2.</span> <span class="nav-text">以 mysql 为例, -p 指定端口映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D-%E5%AE%B9%E5%99%A8%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E5%8F%8A%E5%85%B1%E4%BA%AB"><span class="nav-number">10.</span> <span class="nav-text">( 九 ) 容器数据持久化及共享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8-volume-%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%82"><span class="nav-number">10.1.</span> <span class="nav-text">Docker 官方推荐使用 volume 实现数据持久化。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8"><span class="nav-number">10.2.</span> <span class="nav-text">使用数据卷容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%B0%86%E4%BC%9A%E6%8C%81%E7%BB%AD%E5%88%B0%E6%B2%A1%E6%9C%89%E4%BB%BB%E4%B8%80%E5%AE%B9%E5%99%A8%E5%BA%94%E7%94%A8%E4%B8%BA%E6%AD%A2%E3%80%82%E8%8B%A5%E5%8F%A6%E4%B8%80%E5%AE%B9%E5%99%A8-my-app3-%E5%B0%86-voluem-%E6%8C%82%E8%BD%BD%E5%88%B0-my-app2%EF%BC%8C%E5%8D%B3%E4%BD%BF%E6%88%91%E4%BB%AC%E6%8A%8A-my-app1-%E5%AE%B9%E5%99%A8%E7%A7%BB%E9%99%A4%EF%BC%8C%E4%B9%9F%E4%B8%8D%E5%BD%B1%E5%93%8D-my-app3-%E5%92%8C-my-app2-%E7%9A%84%E6%8C%82%E8%BD%BD%E5%85%B3%E7%B3%BB%E3%80%82"><span class="nav-number">10.2.1.</span> <span class="nav-text">注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">11.</span> <span class="nav-text">结语</span></a></li></ol></div>
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E4%BB%80%E4%B9%88%E6%98%AF-Docker%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">(一) 什么是 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-Docker%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">(二) 为什么需要 Docker？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-Docker-%E5%92%8C%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-number">4.</span> <span class="nav-text">(三) Docker 和虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E5%AE%89%E8%A3%85-Docker"><span class="nav-number">5.</span> <span class="nav-text">(四) 安装 Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94-Docker-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="nav-number">6.</span> <span class="nav-text">(五) Docker 基本知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD-Docker-%E4%BB%93%E5%BA%93-Dockerhub"><span class="nav-number">7.</span> <span class="nav-text">(六) Docker 仓库 Dockerhub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83-Docker-%E9%95%9C%E5%83%8F%E6%8C%87%E4%BB%A4"><span class="nav-number">8.</span> <span class="nav-text">(七) Docker 镜像指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB-Docker-%E5%AE%B9%E5%99%A8-Container"><span class="nav-number">9.</span> <span class="nav-text">(八) Docker 容器 Container</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-ubuntu-%E4%B8%BA%E4%BE%8B%EF%BC%8C%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%90%AF%E4%BA%A4%E4%BA%92%E4%BC%AA%E7%BB%88%E7%AB%AF"><span class="nav-number">9.1.</span> <span class="nav-text">以 ubuntu 为例，本地开启交互伪终端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5-mysql-%E4%B8%BA%E4%BE%8B-p-%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84"><span class="nav-number">9.2.</span> <span class="nav-text">以 mysql 为例, -p 指定端口映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D-%E5%AE%B9%E5%99%A8%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E5%8F%8A%E5%85%B1%E4%BA%AB"><span class="nav-number">10.</span> <span class="nav-text">(九) 容器数据持久化及共享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8-volume-%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%82"><span class="nav-number">10.1.</span> <span class="nav-text">Docker 官方推荐使用 volume 实现数据持久化。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8"><span class="nav-number">10.2.</span> <span class="nav-text">使用数据卷容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AE%B9%E5%99%A8%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%B0%86%E4%BC%9A%E6%8C%81%E7%BB%AD%E5%88%B0%E6%B2%A1%E6%9C%89%E4%BB%BB%E4%B8%80%E5%AE%B9%E5%99%A8%E5%BA%94%E7%94%A8%E4%B8%BA%E6%AD%A2%E3%80%82%E8%8B%A5%E5%8F%A6%E4%B8%80%E5%AE%B9%E5%99%A8-my-app3-%E5%B0%86-voluem-%E6%8C%82%E8%BD%BD%E5%88%B0-my-app2%EF%BC%8C%E5%8D%B3%E4%BD%BF%E6%88%91%E4%BB%AC%E6%8A%8A-my-app1-%E5%AE%B9%E5%99%A8%E7%A7%BB%E9%99%A4%EF%BC%8C%E4%B9%9F%E4%B8%8D%E5%BD%B1%E5%93%8D-my-app3-%E5%92%8C-my-app2-%E7%9A%84%E6%8C%82%E8%BD%BD%E5%85%B3%E7%B3%BB%E3%80%82"><span class="nav-number">10.2.1.</span> <span class="nav-text">注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81-%E7%BB%93%E8%AF%AD"><span class="nav-number">11.</span> <span class="nav-text">(十) 结语</span></a></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -225,7 +225,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12.1k</span>
+    <span title="站点总字数">字数共计：12k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
@@ -346,7 +346,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-13 13:08:54" itemprop="dateModified" datetime="2020-09-13T13:08:54+10:00">2020-09-13</time>
+                <time title="修改时间：2020-09-13 16:00:24" itemprop="dateModified" datetime="2020-09-13T16:00:24+10:00">2020-09-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -388,19 +388,19 @@
     
     <div class="post-body" itemprop="articleBody">
         <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述 Docker 的基本概念以及仓库，镜像，容器的使用。</p>
-<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="( 一 ) 什么是 Docker？"></a>( 一 ) 什么是 Docker？</h2><hr>
+<h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="(一) 什么是 Docker？"></a>(一) 什么是 Docker？</h2><hr>
 <p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。</p>
 <p>开发者通过 Docker 打包他们的应用以及与应用相关的依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的 Linux 机器上，开发者通过 Docker 提供的命令对应用容器进行创建，运行，管理，以及销毁。</p>
-<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="( 二 ) 为什么需要 Docker？"></a>( 二 ) 为什么需要 Docker？</h2><hr>
+<h2 id="二-为什么需要-Docker？"><a href="#二-为什么需要-Docker？" class="headerlink" title="(二) 为什么需要 Docker？"></a>(二) 为什么需要 Docker？</h2><hr>
 <p>使用 Docker 的最大好处就是，根本上解决了软件应用由于运行在不同机器而产生一系列环境冲突的问题。</p>
 <p>举个例子，我们在自己的电脑上编写基于 Python3.7 语法的脚本，可以被本机上 python3 的解释器所识别以及运行。但是，却没办法保证这一脚本可以在别的平台的机器上运行。这正是因为程序员开发的脚本，应用, 程序无一不依赖着机器本身所处的环境。</p>
 <p>而 Docker 作为应用容器，允许程序员把应用的源代码，以及相关依赖包，一系列环境参数，统一封装和打包到容器之中；并且由于容器的可移植性，应用就可以运行在不同的平台之上。</p>
-<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="( 三 ) Docker 和虚拟机"></a>( 三 ) Docker 和虚拟机</h2><hr>
+<h2 id="三-Docker-和虚拟机"><a href="#三-Docker-和虚拟机" class="headerlink" title="(三) Docker 和虚拟机"></a>(三) Docker 和虚拟机</h2><hr>
 <p>(1) Docker 有着比虚拟机更少的抽象层。由于 docker 不需要 Hypervisor 实现硬件资源虚拟化，运行在 docker 容器上的程序直接使用的都是实际物理机的硬件资源。因此在 CPU、内存利用率上 docker 将会在效率上有优势。</p>
 <p>(2) Docker 利用的是宿主机的内核，而不需要 Guest OS。因此，当新建一个容器时，docker 不需要和虚拟机一样重新加载一个操作系统内核。</p>
 <p>(3) Docker 容器的启动是秒级的；而虚拟机启动是分钟级的。</p>
 <p>(4) 一般而言，一台电脑借由虚拟机可以最多同时运行 2，3 个不同的操作系统；却可以同时运行上千个 Docker 容器。</p>
-<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="( 四 ) 安装 Docker"></a>( 四 ) 安装 Docker</h2><hr>
+<h2 id="四-安装-Docker"><a href="#四-安装-Docker" class="headerlink" title="(四) 安装 Docker"></a>(四) 安装 Docker</h2><hr>
 <p>1.请进入 <a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker 官网</a>, 注册您的 DockerHub 账户。</p>
 <p>2.下载，安装，配置 Docker Desktop。</p>
 <ul>
@@ -415,7 +415,7 @@ Docker version 19.03.12, build 48a662</code></pre>
 <pre><code>&gt; docker images
 REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
 #         #      #         #      #</code></pre>
-<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="( 五 ) Docker 基本知识"></a>( 五 ) Docker 基本知识</h2><hr>
+<h2 id="五-Docker-基本知识"><a href="#五-Docker-基本知识" class="headerlink" title="(五) Docker 基本知识"></a>(五) Docker 基本知识</h2><hr>
 <ul>
 <li><p>仓库 Repository<br>为开发者提供一系列打包好的官网应用镜像，第三方应用镜像源</p>
 </li>
@@ -427,7 +427,7 @@ REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
 </li>
 </ul>
 <p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
-<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="( 六 ) Docker 仓库 Dockerhub"></a>( 六 ) Docker 仓库 Dockerhub</h2><hr>
+<h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="(六) Docker 仓库 Dockerhub"></a>(六) Docker 仓库 Dockerhub</h2><hr>
 <p>正如上文提及，Docker 容器都是基于镜像 Image 创建的。那么如何获取镜像呢？</p>
 <p>比如，官方镜像仓库 <a target="_blank" rel="noopener" href="https://hub.docker.com/">DockerHub</a> 为我们提供了大量优质的官方镜像。</p>
 <p>打开命令行终端，</p>
@@ -444,7 +444,7 @@ REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
 ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 <p>4.登出 DockerHub</p>
 <pre><code>&gt; docker logout</code></pre>
-<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="( 七 ) Docker 镜像指令"></a>( 七 ) Docker 镜像指令</h2><hr>
+<h2 id="七-Docker-镜像指令"><a href="#七-Docker-镜像指令" class="headerlink" title="(七) Docker 镜像指令"></a>(七) Docker 镜像指令</h2><hr>
 <p>1.从仓库获取镜像</p>
 <pre><code>&gt; docker pull &lt;镜像仓库名&gt;:&lt;版本号&gt;</code></pre>
 <p>2.查询本地所有存在镜像</p>
@@ -460,7 +460,7 @@ ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 
 # 使用 `push` 命令推送到自己的DockerHub仓库上。
 &gt; docker push username/&lt;自定义镜像名&gt;:&lt;版本号&gt;</code></pre>
-<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="( 八 ) Docker 容器 Container"></a>( 八 ) Docker 容器 Container</h2><hr>
+<h2 id="八-Docker-容器-Container"><a href="#八-Docker-容器-Container" class="headerlink" title="(八) Docker 容器 Container"></a>(八) Docker 容器 Container</h2><hr>
 <p>容器各种状态：</p>
 <p>created（已创建）<br>restarting（重启中）<br>running（运行中）<br>removing（迁移中）<br>paused（暂停）<br>exited（停止）<br>dead（死亡）</p>
 <p>1.基于镜像，创建并运行容器</p>
@@ -526,7 +526,7 @@ ubuntu       latest    4e2eef94cd6b   3 weeks ago  73.9MB</code></pre>
 # 另外 docker load 命令也可以导入一个镜像存储文件
 # import：丢弃了所有的历史记录和元数据信息，仅保存容器当时的快照状态。在导入的时候可以重新制定标签等元数据信息。
 # load：将保存完整记录，体积较大。</code></pre>
-<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="( 九 ) 容器数据持久化及共享"></a>( 九 ) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
+<h2 id="九-容器数据持久化及共享"><a href="#九-容器数据持久化及共享" class="headerlink" title="(九) 容器数据持久化及共享"></a>(九) 容器数据持久化及共享</h2><p>几乎所有应用程序都会产生并保存数据，最终实现数据持久化。而作为应用容器，Docker Container 是如何实现的呢？</p>
 <p>Docker 提供了 3 种持久化数据的方式：</p>
 <p>volumes：存于主机文件系统中 Docker 管理的目录下，解决了跨平台间资料权限和路径引用问题。<br>bind mount：存于主机文件系统中的任意位置。可能由于不同平台间权限和路径引用不同而发生冲突。<br>tmpfs mount（Linux 中）：存于内存中（注意，并不是持久化到磁盘）。在容器的生命周期中，它能被容器用来存放非持久化的状态或敏感信息。</p>
 <p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1599962751/tech_blog/docker/docker1.jpg"></p>
@@ -577,7 +577,7 @@ local     my-vol</code></pre>
 <h3 id="使用数据卷容器"><a href="#使用数据卷容器" class="headerlink" title="使用数据卷容器"></a>使用数据卷容器</h3><p>数据卷容器,顾名思义本身就是个 Docker 容器，只是充当了储存并共享容器数据的角色。<br>我们使用 <code>--volumes-from</code> 命令，将某个容器 volume 的挂载到另一个容器上。</p>
 <p>假如当前有 my-app1 容器，已经与本机实现了 volume 挂载。<br>执行下列命令，将创建 my-app2 容器，并且将 volume 来源 直接挂载到 my-app1 容器</p>
 <pre><code>&gt; docker run --volumes-from &lt;my-app1 容器ID&gt; --name my-app2 -i -t ubuntu /bin/bash</code></pre>
-<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><hr>
+<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="十-结语"><a href="#十-结语" class="headerlink" title="(十) 结语"></a>(十) 结语</h2><hr>
 <p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程，我们将会讲述如何使用 dockerfile 创建 image。</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -713,7 +713,7 @@ local     my-vol</code></pre>
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12.1k</span>
+    <span title="站点总字数">字数共计：12k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
