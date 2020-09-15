@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  
+  <link rel="stylesheet" href="/lib/animate-css/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.luqifu.tech","root":"/","scheme":"Muse","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="本文主要讲述DockerFile的基本概念以及使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DevOps篇 - Docker进阶之DockerFile">
+<meta property="og:url" content="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html">
+<meta property="og:site_name" content="富仔的技术博">
+<meta property="og:description" content="本文主要讲述DockerFile的基本概念以及使用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-09-13T07:23:55.000Z">
+<meta property="article:modified_time" content="2020-09-15T01:47:11.990Z">
+<meta property="article:author" content="Qifu Lu">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="Deployment">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>DevOps篇 - Docker进阶之DockerFile | 富仔的技术博</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="富仔的技术博" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">富仔的技术博</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享开发心得，记录学习点滴</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E4%BB%80%E4%B9%88%E6%98%AF-DockerFile"><span class="nav-number">2.</span> <span class="nav-text">(一) 什么是 DockerFile?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%BD%BF%E7%94%A8-DockerFile-%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">(二) 使用 DockerFile 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E4%BD%BF%E7%94%A8-dockerignore-%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">(三) 使用 .dockerignore 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E5%88%9B%E5%BB%BA-Dockerfile-%E6%96%87%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">(四) 创建 Dockerfile 文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FROM-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.1.</span> <span class="nav-text">FROM 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LABEL-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.2.</span> <span class="nav-text">LABEL 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ENV-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.3.</span> <span class="nav-text">ENV 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WORKDIR-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.4.</span> <span class="nav-text">WORKDIR 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#USER-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.5.</span> <span class="nav-text">USER 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COPY-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.6.</span> <span class="nav-text">COPY 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADD-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.7.</span> <span class="nav-text">ADD 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RUN-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.8.</span> <span class="nav-text">RUN 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMD-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.9.</span> <span class="nav-text">CMD 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ENTRYPOINT-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.10.</span> <span class="nav-text">ENTRYPOINT 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXPOSE-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.11.</span> <span class="nav-text">EXPOSE 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VOLUME-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.12.</span> <span class="nav-text">VOLUME 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ONBUILD-%E6%8C%87%E4%BB%A4"><span class="nav-number">5.13.</span> <span class="nav-text">ONBUILD 指令</span></a></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Qifu Lu"
+      src="https://luqifu.com/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Qifu Lu</p>
+  <div class="site-description" itemprop="description">全栈开发的小日常</div>
+</div>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：14.2k</span>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/LQF2020" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;LQF2020" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/qifu.lu.1" title="FB → https:&#x2F;&#x2F;www.facebook.com&#x2F;qifu.lu.1" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      个人项目
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://luqifu.com/" title="https:&#x2F;&#x2F;luqifu.com" rel="noopener" target="_blank">Portfolio</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://qifublog.com/" title="https:&#x2F;&#x2F;qifublog.com" rel="noopener" target="_blank">Life Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://triplacer.com/" title="https:&#x2F;&#x2F;triplacer.com" rel="noopener" target="_blank">Triplacer</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://financepacker.com/" title="https:&#x2F;&#x2F;financepacker.com" rel="noopener" target="_blank">Financepacker</a>
+        </li>
+    </ul>
+  </div>
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/LQF2020" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://luqifu.com/img/avatar.jpg">
+      <meta itemprop="name" content="Qifu Lu">
+      <meta itemprop="description" content="全栈开发的小日常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="富仔的技术博">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DevOps篇 - Docker进阶之DockerFile
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-13 17:23:55" itemprop="dateCreated datePublished" datetime="2020-09-13T17:23:55+10:00">2020-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-15 11:47:11" itemprop="dateModified" datetime="2020-09-15T11:47:11+10:00">2020-09-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DevOps/" itemprop="url" rel="index"><span itemprop="name">DevOps</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 mins</span>
+            </span>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本教程主要讲述 DockerFile 的基本概念以及使用。</p>
+<h2 id="一-什么是-DockerFile"><a href="#一-什么是-DockerFile" class="headerlink" title="(一) 什么是 DockerFile?"></a>(一) 什么是 DockerFile?</h2><hr>
+<p>Dockerfile 是一个用来构建 Docker 镜像 Image 的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。</p>
+<h2 id="二-使用-DockerFile-文件"><a href="#二-使用-DockerFile-文件" class="headerlink" title="(二) 使用 DockerFile 文件"></a>(二) 使用 DockerFile 文件</h2><hr>
+<p>一般而言， Dockerfile 应位于构建目录的根路径之下。构建目录只包含需要项目源代码，以及 Dockerfile 即可。</p>
+<p>我们可以用 <code>docker build .</code> 指令，默认将当前指令运行的目录下的 Dockerfile 作为构建模板，生成所需的镜像。<code>.</code> 指的是当前上下文 context。</p>
+<p>在构建镜像时，会产生一个 build 的上下文(context)。所谓的上下文就是 docker build 命令的 PATH 或 URL 指定的路径中的文件的集合。由于镜像构建是在 docker daemon（服务器端）完成的。因此，指令第一步，是递归拷贝当前上下文的文件，即当前指令运行路径下所有文件和文件夹复制到 docker 服务器端，再进行镜像构建。</p>
+<div class="note danger"><p>切勿在硬盘根路径下运行 <code>build</code> 指令，这将复制整个硬盘目录到 docker 服务器端。</p>
+</div>
+
+<h2 id="三-使用-dockerignore-文件"><a href="#三-使用-dockerignore-文件" class="headerlink" title="(三) 使用 .dockerignore 文件"></a>(三) 使用 .dockerignore 文件</h2><hr>
+<p>如果希望 docker 在构建时忽略某些文件或文件夹，可以在构建目录下创建 <code>.dockerignore</code> 文件, 指定希望 docker 忽略的文件和文件夹名称,用法和 <code>.gitignore</code> 文件相似。</p>
+<h2 id="四-创建-Dockerfile-文件"><a href="#四-创建-Dockerfile-文件" class="headerlink" title="(四) 创建 Dockerfile 文件"></a>(四) 创建 Dockerfile 文件</h2><p>Dockerfile 拥有一系列的保留关键字，用作构建指令。</p>
+<ul>
+<li>ADD</li>
+<li>COPY</li>
+<li>ENV</li>
+<li>FROM</li>
+<li>LABEL</li>
+<li>USER</li>
+<li>EXPOSE</li>
+<li>VOLUME</li>
+<li>WORKDIR</li>
+<li>RUN</li>
+<li>ENTRYPOINT</li>
+<li>CMD</li>
+<li>ONBUILD</li>
+</ul>
+<h3 id="FROM-指令"><a href="#FROM-指令" class="headerlink" title="FROM 指令"></a>FROM 指令</h3><hr>
+<p>格式</p>
+<pre><code>FROM &lt;Image-Name&gt;:&lt;tag-version&gt;</code></pre>
+<p>Dockerfile 创建镜像，是以一个镜像为基础，在其上进行定制。</p>
+<p>例如，我们可以基于 <code>ubuntu</code> 官方镜像，进行自定义修改，并生成属于自己的新镜像 my-ubuntu。而 <code>FROM</code> 就是指定 基础镜像，因此一个 Dockerfile 中 <code>FROM</code> 是必备的指令，并且必须是第一条指令。</p>
+<pre><code># Dockerfile
+# 基于ubuntu镜像构建
+
+FROM ubuntu</code></pre>
+<p>在 Dockerhub 上有大量优质的服务类官方镜像，如 <code>mysql</code>, <code>tomcat</code>, <code>php</code>, <code>jdk</code>, <code>nginx</code>, <code>apache</code>, <code>python</code>, <code>nodejs</code> 等, 基于这些官方镜像，进行二次开发，创建适合自身项目的运行环境。</p>
+<p>OS 相关的官方镜像，如 <code>debian</code>, <code>centos</code>, <code>ubuntu</code>, <code>fedora</code>, <code>alpine</code>等, 基于这些官方镜像，创建适合自身项目的操作系统环境。</p>
+<h3 id="LABEL-指令"><a href="#LABEL-指令" class="headerlink" title="LABEL 指令"></a>LABEL 指令</h3><hr>
+<p>格式</p>
+<pre><code>LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...</code></pre>
+<p>为键值对类型数据，用于添加元数据到镜像中， 如记录仓库地址，项目维护人联系方式等等</p>
+<pre><code># Dockerfile
+# 设置某个镜像的元数据
+
+FROM ubuntu
+LABEL maintainer="&lt;project-owner&gt; &lt;email-address&gt;" \
+      projectlink="https://github.com/xxx/xxx"</code></pre>
+<div class="note info"><p>用 “\“ 符号将长指令分行，提高可读性</p>
+</div>
+
+<h3 id="ENV-指令"><a href="#ENV-指令" class="headerlink" title="ENV 指令"></a>ENV 指令</h3><hr>
+<p>格式</p>
+<pre><code>ENV &lt;key&gt; &lt;value&gt;
+ENV &lt;key&gt;=&lt;value&gt; ...</code></pre>
+<p>设置镜像的环境变量<br>定义环境变量的同时，可以引用已经定义的环境变量。</p>
+<pre><code># Dockerfile
+# 下载node，version为12.18.3， 引用变量 $NODE_VERSION
+
+FROM ubuntu
+ENV NODE_VERSION 12.18.3
+RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz"</code></pre>
+<h3 id="WORKDIR-指令"><a href="#WORKDIR-指令" class="headerlink" title="WORKDIR 指令"></a>WORKDIR 指令</h3><hr>
+<p>格式</p>
+<pre><code>WORKDIR /path/to/workdir</code></pre>
+<p>一般情况下，容器默认路径为根路径 <code>/</code> 。我们使用 <code>WORKDIR</code> 指令可以修改容器启动时候的工作路径。</p>
+<pre><code># Dockerfile
+# 设置容器启动路径为 `/usr/`
+
+FROM ubuntu
+WORKDIR /user/</code></pre>
+<h3 id="USER-指令"><a href="#USER-指令" class="headerlink" title="USER 指令"></a>USER 指令</h3><hr>
+<p>格式</p>
+<pre><code>USER &lt;user&gt;[:&lt;group&gt;]
+USER &lt;UID&gt;[:&lt;GID&gt;]</code></pre>
+<p>USER 指令和 WORKDIR 相似，都是改变环境状态并影响以后的层。WORKDIR 是改变工作目录，USER 则是改变之后层的执行 RUN, CMD 以及 ENTRYPOINT 这类命令的身份。</p>
+<pre><code># Dockerfile
+# 设置当前 USER 为 redis, 并启动 redis-server
+
+FROM ubuntu
+USER redis
+RUN [ "redis-server" ]</code></pre>
+<h3 id="COPY-指令"><a href="#COPY-指令" class="headerlink" title="COPY 指令"></a>COPY 指令</h3><hr>
+<p>格式</p>
+<pre><code>COPY &lt;src&gt;... &lt;dest&gt;</code></pre>
+<p>将构建目录下的文件，如项目源代码，拷贝到容器镜像中</p>
+<pre><code># Dockerfile
+# 将当前目录下的 file.txt 文件拷贝到 镜像 /usr/ 目录下
+
+FROM ubuntu
+COPY file.txt /usr/</code></pre>
+<h3 id="ADD-指令"><a href="#ADD-指令" class="headerlink" title="ADD 指令"></a>ADD 指令</h3><hr>
+<p>格式</p>
+<pre><code>ADD &lt;src&gt;... &lt;dest&gt;</code></pre>
+<p>ADD 指令除了能完成 COPY 指令的功能外，还可以直接解压压缩文件并把它们添加到镜像中</p>
+<pre><code># Dockerfile
+# 将当前目录下的 project.tar.gz 解压后添加到 镜像 /usr/ 目录下
+
+FROM ubuntu
+ADD project.tar.gz /usr/</code></pre>
+<h3 id="RUN-指令"><a href="#RUN-指令" class="headerlink" title="RUN 指令"></a>RUN 指令</h3><hr>
+<p>格式</p>
+<pre><code>RUN &lt;command&gt; (shell form)
+RUN ["executable", "param1", "param2"] (exec form)</code></pre>
+<p>用于构建镜像，<code>RUN</code> 指令用于执行 SHELL 命令的。默认情况下，Linux 使用 <code>/bin/sh -c</code>; Windows 使用 <code>cmd /S /C</code> 。</p>
+<pre><code># Dockerfile
+# 更新软件库，并且下载vim, git, nodejs到镜像中
+
+FROM ubuntu
+
+# 使用 shell 格式
+RUN apt-get update &amp;&amp; \
+    apt-get upgrade &amp;&amp; \
+    apt-get install vim git nodejs
+
+# 使用 exec 格式， 指定 shell 为 BASH
+RUN ["/bin/bash", "-c", "echo hello"]</code></pre>
+<div class="note info"><p>多个脚本命令通过 “&amp;&amp;” 符号写在一个 run 指令中，可减少 layer 数量, 有效减少镜像体积。</p>
+</div>
+
+<h3 id="CMD-指令"><a href="#CMD-指令" class="headerlink" title="CMD 指令"></a>CMD 指令</h3><hr>
+<p>格式</p>
+<pre><code>CMD ["executable","param1","param2"] (exec form, 推荐使用；注意需要使用双引号。)
+CMD command param1 param2 (shell form)
+CMD ["param1","param2"] (假如定义了ENTRYPOINT，CMD用于指定默认参数)</code></pre>
+<p><span style="color:orange">(i) 一个 Dockerfile 只应该有一个 <code>CMD</code> 命令。如果存在多个 CMD， 只有最后一个会被执行。</span></p>
+<pre><code>FROM ubuntu
+CMD [ "sh", "-c", "echo hi" ]
+CMD [ "sh", "-c", "echo hello" ]
+CMD [ "sh", "-c", "echo world" ]
+
+# 容器启动时，只会打印 “world”</code></pre>
+<p><span style="color:orange">(ii) <code>CMD</code> 命令一般用于定义程序启动的默认行为；启动容器时，假如额外指定执行的命令，<code>CMD</code>命令会被覆盖。</span></p>
+<p>比如，ubuntu 镜像的 CMD 是 /bin/bash, 即默认开启 bash。</p>
+<p>假如运行 ubuntu 容器时，额外指定命令 <code>pwd</code> ，此命令会覆盖 <code>/bin/bash</code> 。</p>
+<pre><code>docker run -it ubuntu echo "hello world"
+
+# 将会打印出 "hello world"</code></pre>
+<p><span style="color:orange">(iii) 如果 <code>CMD</code> 命令和 <code>ENTRYPOINT</code> 命令同时存在，<code>CMD</code> 命令后的内容作 <code>ENTRYPOINT</code> 命令的参数使用。必须统一使用 exec form 格式。</span></p>
+<pre><code>FROM ubuntu
+ENTRYPOINT ["curl"]
+CMD ["http://bar.com/"]
+
+# 容器启动执行 curl http://bar.com/</code></pre>
+<p><span style="color:orange">(iv) <code>shell</code> 格式，默认使用 <code>/bin/sh -c</code>, 并最终都会被转换成 <code>exec</code> 格式执行。</span></p>
+<pre><code>CMD echo $HOME
+转换为
+CMD [ "sh", "-c", "echo $HOME" ]</code></pre>
+<p><span style="color:orange">(vi) <code>exec</code> 格式并不会默认开启 shell。<code>CMD</code> 用作启动项时，需要指定可执行命令的路径。</span></p>
+<pre><code>FROM ubuntu
+CMD ["/usr/bin/wc","--help"]</code></pre>
+<div class="note info"><p><code>CMD</code> 命令用于启动容器时执行的命令; 而 <code>RUN</code> 命令用于镜像的构建阶段</p>
+</div>
+
+<h3 id="ENTRYPOINT-指令"><a href="#ENTRYPOINT-指令" class="headerlink" title="ENTRYPOINT 指令"></a>ENTRYPOINT 指令</h3><hr>
+<p>格式</p>
+<pre><code>ENTRYPOINT ["executable", "param1", "param2"] (推荐，注意需要使用双引号)
+ENTRYPOINT command param1 param2</code></pre>
+<p><span style="color:orange">(i) <code>ENTRYPOINT</code> 用途和 <code>CMD</code> 一样，都是在指定容器启动程序及参数。</span></p>
+<p><span style="color:orange">(ii) Dockerfile 应至少指定一个 <code>ENTRYPOINT</code> 或者 <code>CMD</code> 指令。</span></p>
+<p><span style="color:orange"> (iii) <code>ENTRYPOINT</code> 应当用作容器可执行命令的入口。</span></p>
+<p><span style="color:orange"> (iv) <code>CMD</code> 应当作为 <code>ENTRYPOINT</code> 命令的参数指定器。</span></p>
+<p>假如 Dockerfile 设定如下：</p>
+<pre><code>FROM ubuntu
+ENTRYPOINT [ "top", "-b" ]
+CMD [ "-c" ]</code></pre>
+<p>不带命令行参数运行容器, CMD 参数被追加到 ENTRYPOINT</p>
+<pre><code># 运行容器
+docker run --rm &lt;镜像ID&gt;
+
+# 实际执行命令
+top -b -c</code></pre>
+<p>另一情况，带命令行参数, 会覆盖 CMD 参数：</p>
+<pre><code># 运行容器
+docker run --rm &lt;镜像ID&gt; -n 10
+
+ # 实际执行命令
+top -b -n 10</code></pre>
+<p><span style="color:orange"> (vi) 使用命令行启动容器时，如果有额外的参数，会被追加到 <code>ENTRYPOINT</code> 命令之后。</span></p>
+<pre><code>FROM ubuntu
+ENTRYPOINT [ "top", "-b" ]
+
+# 运行容器，附加参数 -c
+docker run --rm &lt;镜像ID&gt; -c
+
+# 实际执行命令
+top -b -c</code></pre>
+<h3 id="EXPOSE-指令"><a href="#EXPOSE-指令" class="headerlink" title="EXPOSE 指令"></a>EXPOSE 指令</h3><hr>
+<p>格式</p>
+<pre><code>EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]</code></pre>
+<p>设置暴露端口，声明运行时容器提供服务的端口<br>用于运行容器时候， <code>-p</code> 指令进行宿主机与容器间的端口映射</p>
+<pre><code># Dockerfile
+# 暴露容器端口80，协议为TCP和UDP
+
+FROM ubuntu
+EXPOSE 80/tcp
+EXPOSE 80/udp</code></pre>
+<h3 id="VOLUME-指令"><a href="#VOLUME-指令" class="headerlink" title="VOLUME 指令"></a>VOLUME 指令</h3><hr>
+<p>格式</p>
+<pre><code>VOLUME ["/path/to/workdir1", "/path/to/workdir2",...]</code></pre>
+<p>设置容器内某目录作为数据卷（VOLUME），容器运行时自动挂载为匿名卷。<br>往该数据卷目录下，写入的信息都不会记录进容器存储层，而是保存在宿主机的文件系统中。</p>
+<pre><code># Dockerfile
+# 将容器的 /data/ 文件夹设置为数据卷目录
+
+FROM ubuntu
+VOLUME /data</code></pre>
+<p>创建容器时候，将容器的数据卷目录 /data 映射到宿主机 /usr/mydata 目录</p>
+<pre><code>docker run -itd -v /usr/mydata:/data ubuntu:latest /bin/bash</code></pre>
+<h3 id="ONBUILD-指令"><a href="#ONBUILD-指令" class="headerlink" title="ONBUILD 指令"></a>ONBUILD 指令</h3><hr>
+<p>格式</p>
+<pre><code>ONBUILD &lt;INSTRUCTION&gt;</code></pre>
+<p>ONBUILD 是一个特殊的指令，它后面跟的是其它指令，比如 RUN, COPY 等.<br>而这些指令，在当前镜像构建时并不会被执行。而是作为钩子函数，只有以当前镜像为父镜像，去构建下级子镜像的时候才会被执行。</p>
+<p>举个例子，<br>使用下列 Dockerfile 构建镜像，名为 <code>ParentImage</code>:</p>
+<pre><code>FROM ubuntu
+ONBUILD CMD echo "Child Images have been built"</code></pre>
+<p>接着，再以 <code>ParentImage</code> 作为基础镜像，构建 <code>childImage</code></p>
+<pre><code>FROM ParentImage
+...</code></pre>
+<p>将会在构建过程中打印 <code>Child Images have been built</code> 。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+    </div>
+
+    
+    
+    
+        
+
+<div style="margin-top:50px">
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Qifu Lu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html" title="DevOps篇 - Docker进阶之DockerFile">https://www.luqifu.tech/post/devops篇-docker进阶之dockerfile.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"><i class="fa fa-tag"></i> Docker</a>
+              <a href="/tags/DevOps/" rel="tag"><i class="fa fa-tag"></i> DevOps</a>
+              <a href="/tags/CI-CD/" rel="tag"><i class="fa fa-tag"></i> CI/CD</a>
+              <a href="/tags/Deployment/" rel="tag"><i class="fa fa-tag"></i> Deployment</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/devops%E7%AF%87-docker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html" rel="prev" title="DevOps篇 - Docker入门教程">
+      <i class="fa fa-chevron-left"></i> DevOps篇 - Docker入门教程
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qifu Lu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">字数共计：14.2k</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

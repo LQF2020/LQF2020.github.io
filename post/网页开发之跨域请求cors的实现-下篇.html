@@ -31,7 +31,7 @@
 <meta property="og:description" content="本文主要讨论，如何解决网页开发中的跨域请求（CORS）中的冲突。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-08-18T00:09:14.000Z">
-<meta property="article:modified_time" content="2020-09-13T06:16:24.151Z">
+<meta property="article:modified_time" content="2020-09-15T01:42:27.673Z">
 <meta property="article:author" content="Qifu Lu">
 <meta property="article:tag" content="HTTP">
 <meta property="article:tag" content="CORS">
@@ -223,13 +223,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12k</span>
+    <span title="站点总字数">字数共计：14.2k</span>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -242,7 +242,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -344,7 +344,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-13 16:16:24" itemprop="dateModified" datetime="2020-09-13T16:16:24+10:00">2020-09-13</time>
+                <time title="修改时间：2020-09-15 11:42:27" itemprop="dateModified" datetime="2020-09-15T11:42:27+10:00">2020-09-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -410,7 +410,9 @@
 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域冲突）</code></pre>
 <p>开发模式下的跨域冲突的解决，实际上只是利用前端框架所自带的代理服务器，进行请求转发，巧妙地欺骗了浏览器的检查。</p>
 <p>可我们都知道，对于即将上线的项目（生产环境），最后都需要 <code>npm run build</code> 构建打包的，而打包出来的资源都是一堆静态资源 html,css,js 文件, 而所谓的代理服务器，其实也就不存在了。</p>
-<p>因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。</p>
+<div class="note info"><p>因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。</p>
+</div>
+
 <h2 id="三-生产模式"><a href="#三-生产模式" class="headerlink" title="(三) 生产模式"></a>(三) 生产模式</h2><hr>
 <p>那么如何解决生产模式下的跨域冲突呢？首先，我们必须了解浏览器对跨域请求的两大分类，分别是 简单请求 和 非简单请求。关于简单/非简单请求，可前往阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>
 <p>为了形象说明，我们假设有两个源 ：<code>www.domain-a.com</code> 和 <code>www.domain-b.com</code>。源 a 通过浏览器发送了跨域请求到 源 b 所在的服务器。</p>
@@ -432,8 +434,10 @@
 </li>
 </ul>
 <p>因此，面对非简单请求，浏览器在处理上会更加谨慎。</p>
-<p>在正式发送跨域请求前，浏览器先发送一个 <code>预检请求(preflight)</code> 。</p>
+<div class="note info"><p>在正式发送跨域请求前，浏览器先发送一个 <code>预检请求(preflight)</code> 。</p>
 <p>预检请求其实就是浏览器在通知服务器，它将会发一个非简单请求，而且有可能修改服务器上的资源，确认服务器是否允许执行。预检请求通过了，浏览器才会发起真正的非简单请求。</p>
+</div>
+
 <h4 id="基于-content-type-的非简单请求："><a href="#基于-content-type-的非简单请求：" class="headerlink" title="基于 content-type 的非简单请求："></a><span style="color:yellow">基于 content-type 的非简单请求：</span></h4><p>假设 domain A 这次发送了一个方法为 POST，content-type 为 application/json 的请求给 domain B，浏览器就会认为这是一个非简单请求。</p>
 <p>( 1 ) 浏览器发送一个 method 为<code>OPTION</code>的预检请求（preflight）到 domain B 的服务器，并且在请求头带上 <code>origin：domain A</code> 字段<br>( 2 ) 服务器 domain B 获取到预检请求的<code>origin</code>字段，判断请求来源 domain A 是否可信，如果可信，则会在 response header 上添加如下字段：</p>
 <p><code>Access-Control-Allow-Origin: https://www.domain-a.com</code><br><code>Access-Control-Allow-Headers : content-type</code></p>
@@ -590,7 +594,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">字数共计：12k</span>
+    <span title="站点总字数">字数共计：14.2k</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>

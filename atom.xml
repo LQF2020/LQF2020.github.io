@@ -6,7 +6,7 @@
   <link href="https://www.luqifu.tech/atom.xml" rel="self"/>
   
   <link href="https://www.luqifu.tech/"/>
-  <updated>2020-09-13T06:00:24.048Z</updated>
+  <updated>2020-09-15T01:47:11.990Z</updated>
   <id>https://www.luqifu.tech/</id>
   
   <author>
@@ -17,11 +17,36 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>DevOps篇 - 关于Docker入门教程</title>
-    <link href="https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html"/>
-    <id>https://www.luqifu.tech/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</id>
+    <title>DevOps篇 - Docker进阶之DockerFile</title>
+    <link href="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html"/>
+    <id>https://www.luqifu.tech/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html</id>
+    <published>2020-09-13T07:23:55.000Z</published>
+    <updated>2020-09-15T01:47:11.990Z</updated>
+    
+    
+    <summary type="html">本文主要讲述DockerFile的基本概念以及使用。</summary>
+    
+    
+    
+    <category term="DevOps" scheme="https://www.luqifu.tech/categories/DevOps/"/>
+    
+    
+    <category term="Docker" scheme="https://www.luqifu.tech/tags/Docker/"/>
+    
+    <category term="DevOps" scheme="https://www.luqifu.tech/tags/DevOps/"/>
+    
+    <category term="CI/CD" scheme="https://www.luqifu.tech/tags/CI-CD/"/>
+    
+    <category term="Deployment" scheme="https://www.luqifu.tech/tags/Deployment/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>DevOps篇 - Docker入门教程</title>
+    <link href="https://www.luqifu.tech/post/devops%E7%AF%87-docker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html"/>
+    <id>https://www.luqifu.tech/post/devops%E7%AF%87-docker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</id>
     <published>2020-09-12T08:02:38.000Z</published>
-    <updated>2020-09-13T06:00:24.048Z</updated>
+    <updated>2020-09-15T01:47:38.945Z</updated>
     
     
     <summary type="html">本文主要讲述Docker的基本概念以及仓库，镜像，容器的使用。</summary>
@@ -30,6 +55,8 @@
     
     <category term="DevOps" scheme="https://www.luqifu.tech/categories/DevOps/"/>
     
+    
+    <category term="Docker" scheme="https://www.luqifu.tech/tags/Docker/"/>
     
     <category term="DevOps" scheme="https://www.luqifu.tech/tags/DevOps/"/>
     
@@ -65,7 +92,7 @@
     <link href="https://www.luqifu.tech/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html"/>
     <id>https://www.luqifu.tech/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors%E7%9A%84%E5%AE%9E%E7%8E%B0-%E4%B8%8B%E7%AF%87.html</id>
     <published>2020-08-18T00:09:14.000Z</published>
-    <updated>2020-09-13T06:16:24.151Z</updated>
+    <updated>2020-09-15T01:42:27.673Z</updated>
     
     
     <summary type="html">本文主要讨论，如何解决网页开发中的跨域请求（CORS）中的冲突。</summary>
@@ -180,7 +207,7 @@
     <link href="https://www.luqifu.tech/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88.html"/>
     <id>https://www.luqifu.tech/post/digitalocean-node-js-nginx-pm2%E6%95%B4%E5%90%88%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88.html</id>
     <published>2020-08-12T05:15:18.000Z</published>
-    <updated>2020-09-13T06:09:37.383Z</updated>
+    <updated>2020-09-15T01:45:11.946Z</updated>
     
     
     <summary type="html">本文主要讲述如何使用 DigitalOcean(Cloud VPS)， 对 Node.js 应用进行云部署，其中包括配置 Nginx 作为反向代理 以及 Node 进程管理器 PM2 的基本使用说明。</summary>

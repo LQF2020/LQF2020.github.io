@@ -42,11 +42,12 @@
 <p>GoDaddy 配置具体步骤：</p>
 <p><span style="color:orange">创建 A 记录：</span><br>key : @<br>value : DigitalOcean 分配的服务器 IP<br>TTL 默认 1h。</p>
 <p><span style="color:orange">创建 CNAME 记录：</span><br>key : www<br>value 为 @<br>TTL 默认 1h。</p>
-<blockquote>
-<p>注意，域名和 IP 绑定后，由于网络 DNS 缓存机制，对应关系不会立马生效，实际生效时间快则数分钟，慢则数小时。</p>
-</blockquote>
-<p>检验方法：</p>
-<p>打开控制台，输入指令 <code>ping yourdomain.com</code>, 查看连接状态。如果连接返回来自服务器 IP 的网络包，则代表域名已成功匹配 IP。</p>
+<div class="note info"><p>注意，域名和 IP 绑定后，由于网络 DNS 缓存机制，对应关系不会立马生效，实际生效时间快则数分钟，慢则数小时。</p>
+</div>
+
+<div class="note info"><p>检验：<br>打开控制台，输入指令 <code>ping yourdomain.com</code>, 查看连接状态。如果连接返回来自服务器 IP 的网络包，则代表域名已成功匹配 IP。</p>
+</div>
+
 <h3 id="（5）Nginx-下载，进行反向代理配置，域名绑定"><a href="#（5）Nginx-下载，进行反向代理配置，域名绑定" class="headerlink" title="（5）Nginx 下载，进行反向代理配置，域名绑定"></a>（5）Nginx 下载，进行反向代理配置，域名绑定</h3><figure class="highlight sh"><table><tbody><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 本教程使用 Ubuntu18.04.3 操作系统，请根据您 OS 版本进行 Nginx 安装。</span></span><br><span class="line"></span><br><span class="line">sudo apt update <span class="comment"># 更新软件库</span></span><br><span class="line">sudo apt install nginx <span class="comment"># 下载 nginx</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> nginx <span class="comment"># 配置 nginx 作为开机服务</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>当 nginx 下载后，在本地浏览器输入 <a href="http://161.35.59.204/">http://161.35.59.204:80/</a><br>看到 nginx 页面，表示 nginx 服务已经运行起来。</p>
@@ -99,57 +100,6 @@
         <tag>Nginx</tag>
         <tag>DigitalOcean</tag>
         <tag>Cloud Deployment</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>创建DigitalOcean服务器实例Droplet</title>
-    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
-    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
-<h2 id="一-前言"><a href="#一-前言" class="headerlink" title="(一) 前言"></a>(一) 前言</h2><hr>
-<p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
-<h2 id="二-注册账户"><a href="#二-注册账户" class="headerlink" title="(二) 注册账户"></a>(二) 注册账户</h2><hr>
-<p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
-<h2 id="三-创建项目"><a href="#三-创建项目" class="headerlink" title="(三) 创建项目"></a>(三) 创建项目</h2><hr>
-<h3 id="1-登录账户后-创建-new-project"><a href="#1-登录账户后-创建-new-project" class="headerlink" title="1.登录账户后, 创建 new project."></a>1.登录账户后, 创建 new project.</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
-<h3 id="2-填写您的项目名称，描述和用途。"><a href="#2-填写您的项目名称，描述和用途。" class="headerlink" title="2.填写您的项目名称，描述和用途。"></a>2.填写您的项目名称，描述和用途。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
-<h3 id="3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
-<h3 id="4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
-<h3 id="5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h3><blockquote>
-<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
-</blockquote>
-<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
-<h3 id="6-自定义主机名，创建-Droplet"><a href="#6-自定义主机名，创建-Droplet" class="headerlink" title="6.自定义主机名，创建 Droplet"></a>6.自定义主机名，创建 Droplet</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
-<h3 id="7-创建完成后，获取-Droplet-的公网-IP"><a href="#7-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="7.创建完成后，获取 Droplet 的公网 IP"></a>7.创建完成后，获取 Droplet 的公网 IP</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
-<h3 id="8-检查云服务器是否激活"><a href="#8-检查云服务器是否激活" class="headerlink" title="8.检查云服务器是否激活"></a>8.检查云服务器是否激活</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
-<h2 id="四-结语"><a href="#四-结语" class="headerlink" title="(四) 结语"></a>(四) 结语</h2><hr>
-<p>恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</p>
-<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Cloud Deployment</category>
-      </categories>
-      <tags>
-        <tag>DigitalOcean</tag>
-        <tag>Cloud Deployment</tag>
-        <tag>VPS</tag>
       </tags>
   </entry>
   <entry>
@@ -272,8 +222,59 @@ usage: ssh [-46Yy][-b bind_interface]
       </tags>
   </entry>
   <entry>
-    <title>DevOps篇 - 关于Docker入门教程</title>
-    <url>/post/devops%E7%AF%87-%E5%85%B3%E4%BA%8Edocker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</url>
+    <title>创建DigitalOcean服务器实例Droplet</title>
+    <url>/post/%E5%88%9B%E5%BB%BAdigitalocean%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AE%9E%E4%BE%8Bdroplet.html</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述如何使用 DigitalOcean 创建我们的云服务器 VPS。</p>
+<h2 id="一-前言"><a href="#一-前言" class="headerlink" title="(一) 前言"></a>(一) 前言</h2><hr>
+<p>DigitalOcean 是一家建立于美国的云基础架构提供商，面向软件开发人员提供虚拟专用服务器（VPS）， 现在已经是全球第二大的网络寄存服务公司。VPS 价格相对合理,月费最低 5 美金起。</p>
+<h2 id="二-注册账户"><a href="#二-注册账户" class="headerlink" title="(二) 注册账户"></a>(二) 注册账户</h2><hr>
+<p>登录 DigitalOcean 官网，并创建 DigitalOcean 账户：<br>链接：<a href="https://www.digitalocean.com/">https://www.digitalocean.com/</a></p>
+<h2 id="三-创建项目"><a href="#三-创建项目" class="headerlink" title="(三) 创建项目"></a>(三) 创建项目</h2><hr>
+<h3 id="1-登录账户后-创建-new-project"><a href="#1-登录账户后-创建-new-project" class="headerlink" title="1.登录账户后, 创建 new project."></a>1.登录账户后, 创建 new project.</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597292830/tech_blog/DigitalOcean_Droplet_Create/step0.jpg"></p>
+<h3 id="2-填写您的项目名称，描述和用途。"><a href="#2-填写您的项目名称，描述和用途。" class="headerlink" title="2.填写您的项目名称，描述和用途。"></a>2.填写您的项目名称，描述和用途。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step1.jpg"></p>
+<h3 id="3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。"><a href="#3-项目创建后，需要为项目新创建一个-Droplet-（Droplet-就是一个-VPS-服务器实例）。" class="headerlink" title="3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。"></a>3.项目创建后，需要为项目新创建一个 Droplet （Droplet 就是一个 VPS 服务器实例）。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step2.jpg"></p>
+<h3 id="4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。"><a href="#4-选择-Droplet-服务器的云端配置。请根据您实际需要自行配置，本教程中使用-ubuntu18-04-3-LTS-版本。" class="headerlink" title="4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。"></a>4.选择 Droplet 服务器的云端配置。请根据您实际需要自行配置，本教程中使用 ubuntu18.04.3(LTS)版本。</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step3.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step4.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step5.jpg"></p>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step6.jpg"></p>
+<h3 id="5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。"><a href="#5-建议选择添加-SSH-key。这将用于本机远程登录服务器。使用-SSH-keys-验证比传统的密码验证更加安全方便。" class="headerlink" title="5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。"></a>5.建议选择添加 SSH key。这将用于本机远程登录服务器。使用 SSH keys 验证比传统的密码验证更加安全方便。</h3><blockquote>
+<p>尚未拥有 SSH key 公私钥，请参考 <a href="/post/%E4%BD%BF%E7%94%A8ssh-keygen%E5%88%9B%E5%BB%BAssh%E5%85%AC%E9%92%A5%E5%88%9B%E5%BB%BA%E6%95%99%E7%A8%8B.html" title="SSH公钥创建">SSH公钥创建</a> 教程。</p>
+</blockquote>
+<p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step7.jpg"><br><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step8.jpg"></p>
+<h3 id="6-自定义主机名，创建-Droplet"><a href="#6-自定义主机名，创建-Droplet" class="headerlink" title="6.自定义主机名，创建 Droplet"></a>6.自定义主机名，创建 Droplet</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step9.jpg"></p>
+<h3 id="7-创建完成后，获取-Droplet-的公网-IP"><a href="#7-创建完成后，获取-Droplet-的公网-IP" class="headerlink" title="7.创建完成后，获取 Droplet 的公网 IP"></a>7.创建完成后，获取 Droplet 的公网 IP</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step10.jpg"></p>
+<h3 id="8-检查云服务器是否激活"><a href="#8-检查云服务器是否激活" class="headerlink" title="8.检查云服务器是否激活"></a>8.检查云服务器是否激活</h3><p><img src="https://res.cloudinary.com/qifu1995/image/upload/v1597293188/tech_blog/DigitalOcean_Droplet_Create/step11.jpg"></p>
+<h2 id="四-结语"><a href="#四-结语" class="headerlink" title="(四) 结语"></a>(四) 结语</h2><hr>
+<p>恭喜你，你已经拥有了一台 DigitalOcean 的云端服务器。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Cloud Deployment</category>
+      </categories>
+      <tags>
+        <tag>DigitalOcean</tag>
+        <tag>Cloud Deployment</tag>
+        <tag>VPS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DevOps篇 - Docker入门教程</title>
+    <url>/post/devops%E7%AF%87-docker%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.html</url>
     <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文主要讲述 Docker 的基本概念以及仓库，镜像，容器的使用。</p>
 <h2 id="一-什么是-Docker？"><a href="#一-什么是-Docker？" class="headerlink" title="(一) 什么是 Docker？"></a>(一) 什么是 Docker？</h2><hr>
 <p>Docker 是一个开源的应用容器引擎，基于 Go 语言 并遵从 Apache2.0 协议开源。</p>
@@ -313,7 +314,9 @@ REPOSITORY  TAG  IMAGE ID  CREATED  SIZE
 <li><p>DockerFile<br>用于生成 Docker 镜像 Images 的指令文件</p>
 </li>
 </ul>
-<p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
+<div class="note info"><p>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。一切 Docker 容器都是基于镜像构建的。</p>
+</div>
+
 <h2 id="六-Docker-仓库-Dockerhub"><a href="#六-Docker-仓库-Dockerhub" class="headerlink" title="(六) Docker 仓库 Dockerhub"></a>(六) Docker 仓库 Dockerhub</h2><hr>
 <p>正如上文提及，Docker 容器都是基于镜像 Image 创建的。那么如何获取镜像呢？</p>
 <p>比如，官方镜像仓库 <a href="https://hub.docker.com/">DockerHub</a> 为我们提供了大量优质的官方镜像。</p>
@@ -464,8 +467,11 @@ local     my-vol</code></pre>
 <h3 id="使用数据卷容器"><a href="#使用数据卷容器" class="headerlink" title="使用数据卷容器"></a>使用数据卷容器</h3><p>数据卷容器,顾名思义本身就是个 Docker 容器，只是充当了储存并共享容器数据的角色。<br>我们使用 <code>--volumes-from</code> 命令，将某个容器 volume 的挂载到另一个容器上。</p>
 <p>假如当前有 my-app1 容器，已经与本机实现了 volume 挂载。<br>执行下列命令，将创建 my-app2 容器，并且将 volume 来源 直接挂载到 my-app1 容器</p>
 <pre><code>&gt; docker run --volumes-from &lt;my-app1 容器ID&gt; --name my-app2 -i -t ubuntu /bin/bash</code></pre>
-<h4 id="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。"><a href="#注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器-my-app3-将-voluem-挂载到-my-app2，即使我们把-my-app1-容器移除，也不影响-my-app3-和-my-app2-的挂载关系。" class="headerlink" title="注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。"></a>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 voluem 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</h4><h2 id="十-结语"><a href="#十-结语" class="headerlink" title="(十) 结语"></a>(十) 结语</h2><hr>
-<p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程，我们将会讲述如何使用 dockerfile 创建 image。</p>
+<div class="note info"><p>注意，数据卷容器的生命周期将会持续到没有任一容器应用为止。若另一容器 my-app3 将 volume 挂载到 my-app2，即使我们把 my-app1 容器移除，也不影响 my-app3 和 my-app2 的挂载关系。</p>
+</div>
+
+<h2 id="十-结语"><a href="#十-结语" class="headerlink" title="(十) 结语"></a>(十) 结语</h2><hr>
+<p>到这，Docker 入门篇教程已经全部结束。<br>下一篇教程 <a href="/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html" title="DevOps篇 - Docker进阶之DockerFile">DevOps篇 - Docker进阶之DockerFile</a>, 将会进一步讨论 Dockerfile 的使用。</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -489,6 +495,259 @@ local     my-vol</code></pre>
         <category>DevOps</category>
       </categories>
       <tags>
+        <tag>Docker</tag>
+        <tag>DevOps</tag>
+        <tag>CI/CD</tag>
+        <tag>Deployment</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DevOps篇 - Docker进阶之DockerFile</title>
+    <url>/post/devops%E7%AF%87-docker%E8%BF%9B%E9%98%B6%E4%B9%8Bdockerfile.html</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本教程主要讲述 DockerFile 的基本概念以及使用。</p>
+<h2 id="一-什么是-DockerFile"><a href="#一-什么是-DockerFile" class="headerlink" title="(一) 什么是 DockerFile?"></a>(一) 什么是 DockerFile?</h2><hr>
+<p>Dockerfile 是一个用来构建 Docker 镜像 Image 的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。</p>
+<h2 id="二-使用-DockerFile-文件"><a href="#二-使用-DockerFile-文件" class="headerlink" title="(二) 使用 DockerFile 文件"></a>(二) 使用 DockerFile 文件</h2><hr>
+<p>一般而言， Dockerfile 应位于构建目录的根路径之下。构建目录只包含需要项目源代码，以及 Dockerfile 即可。</p>
+<p>我们可以用 <code>docker build .</code> 指令，默认将当前指令运行的目录下的 Dockerfile 作为构建模板，生成所需的镜像。<code>.</code> 指的是当前上下文 context。</p>
+<p>在构建镜像时，会产生一个 build 的上下文(context)。所谓的上下文就是 docker build 命令的 PATH 或 URL 指定的路径中的文件的集合。由于镜像构建是在 docker daemon（服务器端）完成的。因此，指令第一步，是递归拷贝当前上下文的文件，即当前指令运行路径下所有文件和文件夹复制到 docker 服务器端，再进行镜像构建。</p>
+<div class="note danger"><p>切勿在硬盘根路径下运行 <code>build</code> 指令，这将复制整个硬盘目录到 docker 服务器端。</p>
+</div>
+
+<h2 id="三-使用-dockerignore-文件"><a href="#三-使用-dockerignore-文件" class="headerlink" title="(三) 使用 .dockerignore 文件"></a>(三) 使用 .dockerignore 文件</h2><hr>
+<p>如果希望 docker 在构建时忽略某些文件或文件夹，可以在构建目录下创建 <code>.dockerignore</code> 文件, 指定希望 docker 忽略的文件和文件夹名称,用法和 <code>.gitignore</code> 文件相似。</p>
+<h2 id="四-创建-Dockerfile-文件"><a href="#四-创建-Dockerfile-文件" class="headerlink" title="(四) 创建 Dockerfile 文件"></a>(四) 创建 Dockerfile 文件</h2><p>Dockerfile 拥有一系列的保留关键字，用作构建指令。</p>
+<ul>
+<li>ADD</li>
+<li>COPY</li>
+<li>ENV</li>
+<li>FROM</li>
+<li>LABEL</li>
+<li>USER</li>
+<li>EXPOSE</li>
+<li>VOLUME</li>
+<li>WORKDIR</li>
+<li>RUN</li>
+<li>ENTRYPOINT</li>
+<li>CMD</li>
+<li>ONBUILD</li>
+</ul>
+<h3 id="FROM-指令"><a href="#FROM-指令" class="headerlink" title="FROM 指令"></a>FROM 指令</h3><hr>
+<p>格式</p>
+<pre><code>FROM &lt;Image-Name&gt;:&lt;tag-version&gt;</code></pre>
+<p>Dockerfile 创建镜像，是以一个镜像为基础，在其上进行定制。</p>
+<p>例如，我们可以基于 <code>ubuntu</code> 官方镜像，进行自定义修改，并生成属于自己的新镜像 my-ubuntu。而 <code>FROM</code> 就是指定 基础镜像，因此一个 Dockerfile 中 <code>FROM</code> 是必备的指令，并且必须是第一条指令。</p>
+<pre><code># Dockerfile
+# 基于ubuntu镜像构建
+
+FROM ubuntu</code></pre>
+<p>在 Dockerhub 上有大量优质的服务类官方镜像，如 <code>mysql</code>, <code>tomcat</code>, <code>php</code>, <code>jdk</code>, <code>nginx</code>, <code>apache</code>, <code>python</code>, <code>nodejs</code> 等, 基于这些官方镜像，进行二次开发，创建适合自身项目的运行环境。</p>
+<p>OS 相关的官方镜像，如 <code>debian</code>, <code>centos</code>, <code>ubuntu</code>, <code>fedora</code>, <code>alpine</code>等, 基于这些官方镜像，创建适合自身项目的操作系统环境。</p>
+<h3 id="LABEL-指令"><a href="#LABEL-指令" class="headerlink" title="LABEL 指令"></a>LABEL 指令</h3><hr>
+<p>格式</p>
+<pre><code>LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...</code></pre>
+<p>为键值对类型数据，用于添加元数据到镜像中， 如记录仓库地址，项目维护人联系方式等等</p>
+<pre><code># Dockerfile
+# 设置某个镜像的元数据
+
+FROM ubuntu
+LABEL maintainer="&lt;project-owner&gt; &lt;email-address&gt;" \
+      projectlink="https://github.com/xxx/xxx"</code></pre>
+<div class="note info"><p>用 “\“ 符号将长指令分行，提高可读性</p>
+</div>
+
+<h3 id="ENV-指令"><a href="#ENV-指令" class="headerlink" title="ENV 指令"></a>ENV 指令</h3><hr>
+<p>格式</p>
+<pre><code>ENV &lt;key&gt; &lt;value&gt;
+ENV &lt;key&gt;=&lt;value&gt; ...</code></pre>
+<p>设置镜像的环境变量<br>定义环境变量的同时，可以引用已经定义的环境变量。</p>
+<pre><code># Dockerfile
+# 下载node，version为12.18.3， 引用变量 $NODE_VERSION
+
+FROM ubuntu
+ENV NODE_VERSION 12.18.3
+RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz"</code></pre>
+<h3 id="WORKDIR-指令"><a href="#WORKDIR-指令" class="headerlink" title="WORKDIR 指令"></a>WORKDIR 指令</h3><hr>
+<p>格式</p>
+<pre><code>WORKDIR /path/to/workdir</code></pre>
+<p>一般情况下，容器默认路径为根路径 <code>/</code> 。我们使用 <code>WORKDIR</code> 指令可以修改容器启动时候的工作路径。</p>
+<pre><code># Dockerfile
+# 设置容器启动路径为 `/usr/`
+
+FROM ubuntu
+WORKDIR /user/</code></pre>
+<h3 id="USER-指令"><a href="#USER-指令" class="headerlink" title="USER 指令"></a>USER 指令</h3><hr>
+<p>格式</p>
+<pre><code>USER &lt;user&gt;[:&lt;group&gt;]
+USER &lt;UID&gt;[:&lt;GID&gt;]</code></pre>
+<p>USER 指令和 WORKDIR 相似，都是改变环境状态并影响以后的层。WORKDIR 是改变工作目录，USER 则是改变之后层的执行 RUN, CMD 以及 ENTRYPOINT 这类命令的身份。</p>
+<pre><code># Dockerfile
+# 设置当前 USER 为 redis, 并启动 redis-server
+
+FROM ubuntu
+USER redis
+RUN [ "redis-server" ]</code></pre>
+<h3 id="COPY-指令"><a href="#COPY-指令" class="headerlink" title="COPY 指令"></a>COPY 指令</h3><hr>
+<p>格式</p>
+<pre><code>COPY &lt;src&gt;... &lt;dest&gt;</code></pre>
+<p>将构建目录下的文件，如项目源代码，拷贝到容器镜像中</p>
+<pre><code># Dockerfile
+# 将当前目录下的 file.txt 文件拷贝到 镜像 /usr/ 目录下
+
+FROM ubuntu
+COPY file.txt /usr/</code></pre>
+<h3 id="ADD-指令"><a href="#ADD-指令" class="headerlink" title="ADD 指令"></a>ADD 指令</h3><hr>
+<p>格式</p>
+<pre><code>ADD &lt;src&gt;... &lt;dest&gt;</code></pre>
+<p>ADD 指令除了能完成 COPY 指令的功能外，还可以直接解压压缩文件并把它们添加到镜像中</p>
+<pre><code># Dockerfile
+# 将当前目录下的 project.tar.gz 解压后添加到 镜像 /usr/ 目录下
+
+FROM ubuntu
+ADD project.tar.gz /usr/</code></pre>
+<h3 id="RUN-指令"><a href="#RUN-指令" class="headerlink" title="RUN 指令"></a>RUN 指令</h3><hr>
+<p>格式</p>
+<pre><code>RUN &lt;command&gt; (shell form)
+RUN ["executable", "param1", "param2"] (exec form)</code></pre>
+<p>用于构建镜像，<code>RUN</code> 指令用于执行 SHELL 命令的。默认情况下，Linux 使用 <code>/bin/sh -c</code>; Windows 使用 <code>cmd /S /C</code> 。</p>
+<pre><code># Dockerfile
+# 更新软件库，并且下载vim, git, nodejs到镜像中
+
+FROM ubuntu
+
+# 使用 shell 格式
+RUN apt-get update &amp;&amp; \
+    apt-get upgrade &amp;&amp; \
+    apt-get install vim git nodejs
+
+# 使用 exec 格式， 指定 shell 为 BASH
+RUN ["/bin/bash", "-c", "echo hello"]</code></pre>
+<div class="note info"><p>多个脚本命令通过 “&amp;&amp;” 符号写在一个 run 指令中，可减少 layer 数量, 有效减少镜像体积。</p>
+</div>
+
+<h3 id="CMD-指令"><a href="#CMD-指令" class="headerlink" title="CMD 指令"></a>CMD 指令</h3><hr>
+<p>格式</p>
+<pre><code>CMD ["executable","param1","param2"] (exec form, 推荐使用；注意需要使用双引号。)
+CMD command param1 param2 (shell form)
+CMD ["param1","param2"] (假如定义了ENTRYPOINT，CMD用于指定默认参数)</code></pre>
+<p><span style="color:orange">(i) 一个 Dockerfile 只应该有一个 <code>CMD</code> 命令。如果存在多个 CMD， 只有最后一个会被执行。</span></p>
+<pre><code>FROM ubuntu
+CMD [ "sh", "-c", "echo hi" ]
+CMD [ "sh", "-c", "echo hello" ]
+CMD [ "sh", "-c", "echo world" ]
+
+# 容器启动时，只会打印 “world”</code></pre>
+<p><span style="color:orange">(ii) <code>CMD</code> 命令一般用于定义程序启动的默认行为；启动容器时，假如额外指定执行的命令，<code>CMD</code>命令会被覆盖。</span></p>
+<p>比如，ubuntu 镜像的 CMD 是 /bin/bash, 即默认开启 bash。</p>
+<p>假如运行 ubuntu 容器时，额外指定命令 <code>pwd</code> ，此命令会覆盖 <code>/bin/bash</code> 。</p>
+<pre><code>docker run -it ubuntu echo "hello world"
+
+# 将会打印出 "hello world"</code></pre>
+<p><span style="color:orange">(iii) 如果 <code>CMD</code> 命令和 <code>ENTRYPOINT</code> 命令同时存在，<code>CMD</code> 命令后的内容作 <code>ENTRYPOINT</code> 命令的参数使用。必须统一使用 exec form 格式。</span></p>
+<pre><code>FROM ubuntu
+ENTRYPOINT ["curl"]
+CMD ["http://bar.com/"]
+
+# 容器启动执行 curl http://bar.com/</code></pre>
+<p><span style="color:orange">(iv) <code>shell</code> 格式，默认使用 <code>/bin/sh -c</code>, 并最终都会被转换成 <code>exec</code> 格式执行。</span></p>
+<pre><code>CMD echo $HOME
+转换为
+CMD [ "sh", "-c", "echo $HOME" ]</code></pre>
+<p><span style="color:orange">(vi) <code>exec</code> 格式并不会默认开启 shell。<code>CMD</code> 用作启动项时，需要指定可执行命令的路径。</span></p>
+<pre><code>FROM ubuntu
+CMD ["/usr/bin/wc","--help"]</code></pre>
+<div class="note info"><p><code>CMD</code> 命令用于启动容器时执行的命令; 而 <code>RUN</code> 命令用于镜像的构建阶段</p>
+</div>
+
+<h3 id="ENTRYPOINT-指令"><a href="#ENTRYPOINT-指令" class="headerlink" title="ENTRYPOINT 指令"></a>ENTRYPOINT 指令</h3><hr>
+<p>格式</p>
+<pre><code>ENTRYPOINT ["executable", "param1", "param2"] (推荐，注意需要使用双引号)
+ENTRYPOINT command param1 param2</code></pre>
+<p><span style="color:orange">(i) <code>ENTRYPOINT</code> 用途和 <code>CMD</code> 一样，都是在指定容器启动程序及参数。</span></p>
+<p><span style="color:orange">(ii) Dockerfile 应至少指定一个 <code>ENTRYPOINT</code> 或者 <code>CMD</code> 指令。</span></p>
+<p><span style="color:orange"> (iii) <code>ENTRYPOINT</code> 应当用作容器可执行命令的入口。</span></p>
+<p><span style="color:orange"> (iv) <code>CMD</code> 应当作为 <code>ENTRYPOINT</code> 命令的参数指定器。</span></p>
+<p>假如 Dockerfile 设定如下：</p>
+<pre><code>FROM ubuntu
+ENTRYPOINT [ "top", "-b" ]
+CMD [ "-c" ]</code></pre>
+<p>不带命令行参数运行容器, CMD 参数被追加到 ENTRYPOINT</p>
+<pre><code># 运行容器
+docker run --rm &lt;镜像ID&gt;
+
+# 实际执行命令
+top -b -c</code></pre>
+<p>另一情况，带命令行参数, 会覆盖 CMD 参数：</p>
+<pre><code># 运行容器
+docker run --rm &lt;镜像ID&gt; -n 10
+
+ # 实际执行命令
+top -b -n 10</code></pre>
+<p><span style="color:orange"> (vi) 使用命令行启动容器时，如果有额外的参数，会被追加到 <code>ENTRYPOINT</code> 命令之后。</span></p>
+<pre><code>FROM ubuntu
+ENTRYPOINT [ "top", "-b" ]
+
+# 运行容器，附加参数 -c
+docker run --rm &lt;镜像ID&gt; -c
+
+# 实际执行命令
+top -b -c</code></pre>
+<h3 id="EXPOSE-指令"><a href="#EXPOSE-指令" class="headerlink" title="EXPOSE 指令"></a>EXPOSE 指令</h3><hr>
+<p>格式</p>
+<pre><code>EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]</code></pre>
+<p>设置暴露端口，声明运行时容器提供服务的端口<br>用于运行容器时候， <code>-p</code> 指令进行宿主机与容器间的端口映射</p>
+<pre><code># Dockerfile
+# 暴露容器端口80，协议为TCP和UDP
+
+FROM ubuntu
+EXPOSE 80/tcp
+EXPOSE 80/udp</code></pre>
+<h3 id="VOLUME-指令"><a href="#VOLUME-指令" class="headerlink" title="VOLUME 指令"></a>VOLUME 指令</h3><hr>
+<p>格式</p>
+<pre><code>VOLUME ["/path/to/workdir1", "/path/to/workdir2",...]</code></pre>
+<p>设置容器内某目录作为数据卷（VOLUME），容器运行时自动挂载为匿名卷。<br>往该数据卷目录下，写入的信息都不会记录进容器存储层，而是保存在宿主机的文件系统中。</p>
+<pre><code># Dockerfile
+# 将容器的 /data/ 文件夹设置为数据卷目录
+
+FROM ubuntu
+VOLUME /data</code></pre>
+<p>创建容器时候，将容器的数据卷目录 /data 映射到宿主机 /usr/mydata 目录</p>
+<pre><code>docker run -itd -v /usr/mydata:/data ubuntu:latest /bin/bash</code></pre>
+<h3 id="ONBUILD-指令"><a href="#ONBUILD-指令" class="headerlink" title="ONBUILD 指令"></a>ONBUILD 指令</h3><hr>
+<p>格式</p>
+<pre><code>ONBUILD &lt;INSTRUCTION&gt;</code></pre>
+<p>ONBUILD 是一个特殊的指令，它后面跟的是其它指令，比如 RUN, COPY 等.<br>而这些指令，在当前镜像构建时并不会被执行。而是作为钩子函数，只有以当前镜像为父镜像，去构建下级子镜像的时候才会被执行。</p>
+<p>举个例子，<br>使用下列 Dockerfile 构建镜像，名为 <code>ParentImage</code>:</p>
+<pre><code>FROM ubuntu
+ONBUILD CMD echo "Child Images have been built"</code></pre>
+<p>接着，再以 <code>ParentImage</code> 作为基础镜像，构建 <code>childImage</code></p>
+<pre><code>FROM ParentImage
+...</code></pre>
+<p>将会在构建过程中打印 <code>Child Images have been built</code> 。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>DevOps</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
         <tag>DevOps</tag>
         <tag>CI/CD</tag>
         <tag>Deployment</tag>
@@ -522,7 +781,9 @@ local     my-vol</code></pre>
 前端页面 --&gt; 前端代理服务器 --&gt;后端服务器 （无跨域冲突）</code></pre>
 <p>开发模式下的跨域冲突的解决，实际上只是利用前端框架所自带的代理服务器，进行请求转发，巧妙地欺骗了浏览器的检查。</p>
 <p>可我们都知道，对于即将上线的项目（生产环境），最后都需要 <code>npm run build</code> 构建打包的，而打包出来的资源都是一堆静态资源 html,css,js 文件, 而所谓的代理服务器，其实也就不存在了。</p>
-<p>因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。</p>
+<div class="note info"><p>因此，要从根本上解决跨域冲突，终究还是得在服务器端进行跨域设置，即解决生产模式下的跨域冲突。</p>
+</div>
+
 <h2 id="三-生产模式"><a href="#三-生产模式" class="headerlink" title="(三) 生产模式"></a>(三) 生产模式</h2><hr>
 <p>那么如何解决生产模式下的跨域冲突呢？首先，我们必须了解浏览器对跨域请求的两大分类，分别是 简单请求 和 非简单请求。关于简单/非简单请求，可前往阅读上一篇教程 <a href="/post/%E7%BD%91%E9%A1%B5%E5%BC%80%E5%8F%91%E4%B9%8B%E4%BB%80%E4%B9%88%E6%98%AF%E8%B7%A8%E5%9F%9F%E8%AF%B7%E6%B1%82cors-%E4%B8%8A%E7%AF%87.html" title="网页开发之什么是跨域请求 CORS (上篇)">网页开发之什么是跨域请求 CORS (上篇)</a> 。</p>
 <p>为了形象说明，我们假设有两个源 ：<code>www.domain-a.com</code> 和 <code>www.domain-b.com</code>。源 a 通过浏览器发送了跨域请求到 源 b 所在的服务器。</p>
@@ -544,8 +805,10 @@ local     my-vol</code></pre>
 </li>
 </ul>
 <p>因此，面对非简单请求，浏览器在处理上会更加谨慎。</p>
-<p>在正式发送跨域请求前，浏览器先发送一个 <code>预检请求(preflight)</code> 。</p>
+<div class="note info"><p>在正式发送跨域请求前，浏览器先发送一个 <code>预检请求(preflight)</code> 。</p>
 <p>预检请求其实就是浏览器在通知服务器，它将会发一个非简单请求，而且有可能修改服务器上的资源，确认服务器是否允许执行。预检请求通过了，浏览器才会发起真正的非简单请求。</p>
+</div>
+
 <h4 id="基于-content-type-的非简单请求："><a href="#基于-content-type-的非简单请求：" class="headerlink" title="基于 content-type 的非简单请求："></a><span style="color:yellow">基于 content-type 的非简单请求：</span></h4><p>假设 domain A 这次发送了一个方法为 POST，content-type 为 application/json 的请求给 domain B，浏览器就会认为这是一个非简单请求。</p>
 <p>( 1 ) 浏览器发送一个 method 为<code>OPTION</code>的预检请求（preflight）到 domain B 的服务器，并且在请求头带上 <code>origin：domain A</code> 字段<br>( 2 ) 服务器 domain B 获取到预检请求的<code>origin</code>字段，判断请求来源 domain A 是否可信，如果可信，则会在 response header 上添加如下字段：</p>
 <p><code>Access-Control-Allow-Origin: https://www.domain-a.com</code><br><code>Access-Control-Allow-Headers : content-type</code></p>
